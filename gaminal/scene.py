@@ -1,6 +1,7 @@
 from gaminal.object import Object
 from gaminal.image import Image
 from gaminal.image_component import ImageComponent
+from gaminal.custom_component import CustomComponent
 from json import load
 
 class Scene:
@@ -27,6 +28,8 @@ class Scene:
                 if component_data["type"] == "image":
                     image = Image.from_file(component_data["file"])
                     object.add_component(ImageComponent(image))
+                elif component_data["type"] == "custom":
+                    object.add_component(CustomComponent(component_data["file"]))
 
             scene.add_object(object)
 
