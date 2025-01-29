@@ -1,5 +1,5 @@
 from gaminal.screen import Screen
-from time import sleep
+from time import sleep, time
 
 class App:
     _instance = None
@@ -12,6 +12,8 @@ class App:
         self.running = False
         self.scenes = {}
         self.current_scene_name = None
+        self.now = 0
+        self.dt = 0
     def stop(self):
         self.running = False
     def add_scene(self, name, scene):
@@ -21,8 +23,12 @@ class App:
     def set_scene(self, name):
         self.current_scene_name = self.scenes[name]
     def run(self):
+        self.now = time()
+        last_time = self.now
         self.running = True
         while self.running:
+            frame_start = time()
+            #
             scene = self.scenes[self.current_scene_name]
             # update
             scene.update()
@@ -30,4 +36,10 @@ class App:
             self.screen.clear()
             scene.draw()
             self.screen.print()
-            sleep(0.1)
+            # time management
+            elapsed_time = time()-frame_start
+            sleep(max(0, 1/20-elapsed_time))
+            self.now = time()
+            self.dt = self.now-last_time
+            last_time = self.now
+            

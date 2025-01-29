@@ -45,6 +45,14 @@ class Image:
                 char = image.data[dx][dy]
                 if char == image.alphachar: continue
                 self.set(x + dx, y + dy, char)
+    def debug_draw(image):
+        print("+", "-" * image.width, "+", sep="")
+        for y in range(image.height):
+            print("|", end="")
+            for x in range(image.width):
+                print(image.data[x][y], end="")
+            print("|")
+        print("+", "-" * image.width, "+", sep="")
 
 if __name__ == "__main__":
     def draw(image):
@@ -62,31 +70,31 @@ if __name__ == "__main__":
 #,,,,,,#
 #......#
 ########""")
-    draw(image)
+    image.debug_draw()
 
     image2 = Image(4, 2)
-    draw(image2)
+    image2.debug_draw()
     
     image2.set(0, 0, "A")
     image2.set(1, 1, "B")
     image2.set(2, 0, "C")
     image2.set(3, 1, "D")
-    draw(image2)
+    image2.debug_draw()
     
     image.paste(image2, 4, 1)
-    draw(image)
+    image.debug_draw()
     
     image.paste(image2, 4, 2)
-    draw(image)
+    image.debug_draw()
     
     image2.fill("O")
-    draw(image2)
+    image2.debug_draw()
 
     image2.alphachar = "@"
     image2.set(1, 1, image2.alphachar)
     image2.set(2, 1, " ")
-    draw(image2)
+    image2.debug_draw()
 
     image.fill("*")
     image.paste(image2, 0, 2)
-    draw(image)
+    image.debug_draw()

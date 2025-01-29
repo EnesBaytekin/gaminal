@@ -1,6 +1,8 @@
 from gaminal.object import Object
 from gaminal.image import Image
 from gaminal.image_component import ImageComponent
+from gaminal.animation import Animation
+from gaminal.animation_component import AnimationComponent
 from gaminal.custom_component import CustomComponent
 from json import load
 
@@ -28,6 +30,9 @@ class Scene:
                 if component_data["type"] == "image":
                     image = Image.from_file(component_data["file"])
                     object.add_component("image", ImageComponent(image))
+                elif component_data["type"] == "animation":
+                    animation = Animation(component_data["file"], component_data.get("speed", 1), component_data.get("loop", True))
+                    object.add_component("animation", AnimationComponent(animation))
                 elif component_data["type"] == "custom":
                     object.add_component(component_data["file"], CustomComponent(component_data["file"]))
 
