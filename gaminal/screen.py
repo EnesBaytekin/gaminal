@@ -1,5 +1,5 @@
-from image import Image
-from util import clear_terminal
+from gaminal.image import Image
+from gaminal.util import clear_terminal
 
 class Screen(Image):
     def __init__(self, width=80, height=24):

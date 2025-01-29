@@ -1,5 +1,4 @@
-from os import system
-from os import name
+from os import system, name
 
 if name == 'nt':
     def clear_terminal():

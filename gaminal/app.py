@@ -1,4 +1,4 @@
-from screen import Screen
+from gaminal.screen import Screen
 from time import sleep
 
 class App:

@@ -5,8 +5,8 @@ class Object:
         self.x = x
         self.y = y
         self.components = {}
-    def add_component(self, name, component):
-        self.components[name] = component
+    def add_component(self, component):
+        self.components[type(component)] = component
     def draw(self):
         for component in self.components.values():
             component.draw(self)

@@ -1,0 +1,52 @@
+[
+    {
+        "x": 45,
+        "y": 15,
+        "components": [
+            {
+                "type": "image",
+                "file": "images/player.img"
+            }
+        ]
+    },
+    {
+        "x": 12,
+        "y": 17,
+        "components": [
+            {
+                "type": "image",
+                "file": "images/player.img"
+            }
+        ]
+    },
+    {
+        "x": 5,
+        "y": 16,
+        "components": [
+            {
+                "type": "image",
+                "file": "images/box.img"
+            }
+        ]
+    },
+    {
+        "x": 15,
+        "y": 10,
+        "components": [
+            {
+                "type": "image",
+                "file": "images/tree.img"
+            }
+        ]
+    },
+    {
+        "x": 25,
+        "y": 4,
+        "components": [
+            {
+                "type": "image",
+                "file": "images/tower.img"
+            }
+        ]
+    }
+]

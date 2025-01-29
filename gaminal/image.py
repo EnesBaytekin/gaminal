@@ -7,6 +7,19 @@ class Image:
         self.alphachar = alphachar
         self.data = [[self.alphachar for y in range(self.height)] for x in range(self.width)]
     @classmethod
+    def from_file(cls, path):
+        with open(path) as file:
+            first_line = file.readline()
+            if first_line.startswith("alphachar="):
+                alphachar = first_line[len("alphachar=")]
+            else:
+                alphachar = " "
+                file.seek(0)
+            data = file.read()
+            while data[-1] == "\n":
+                data = data[:-1]
+            return cls.from_data(data, alphachar)
+    @classmethod
     def from_data(cls, data, alphachar=" "):
         data = data.split("\n")
         width = max(len(line) for line in data)
