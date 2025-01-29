@@ -10,9 +10,10 @@ class MovementScript:
             self.speed *= -1
         object.x += self.speed
         
+        image_component = object.get_component("image")
         if self.speed < 0:
-            list(object.components.values())[0].image.set(0, 0, "<")
-            list(object.components.values())[0].image.set(1, 0, ")")
+            image_component.image.set(0, 0, "<")
+            image_component.image.set(1, 0, ")")
         else:
-            list(object.components.values())[0].image.set(0, 0, "(")
-            list(object.components.values())[0].image.set(1, 0, ">")
+            image_component.image.set(0, 0, "(")
+            image_component.image.set(1, 0, ">")

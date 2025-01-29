@@ -27,9 +27,9 @@ class Scene:
             for component_data in object_data["components"]:
                 if component_data["type"] == "image":
                     image = Image.from_file(component_data["file"])
-                    object.add_component(ImageComponent(image))
+                    object.add_component("image", ImageComponent(image))
                 elif component_data["type"] == "custom":
-                    object.add_component(CustomComponent(component_data["file"]))
+                    object.add_component(component_data["file"], CustomComponent(component_data["file"]))
 
             scene.add_object(object)
 
