@@ -14,6 +14,7 @@ class App:
         self.current_scene_name = None
         self.now = 0
         self.dt = 0
+        self.target_fps = 30
     def stop(self):
         self.running = False
     def add_scene(self, name, scene):
@@ -38,7 +39,7 @@ class App:
             self.screen.print()
             # time management
             elapsed_time = time()-frame_start
-            sleep(max(0, 1/20-elapsed_time))
+            sleep(max(0, 1/self.target_fps-elapsed_time))
             self.now = time()
             self.dt = self.now-last_time
             last_time = self.now

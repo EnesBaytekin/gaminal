@@ -1,14 +1,15 @@
-
+from gaminal import *
 
 class MovementScript:
     def __init__(self):
-        self.speed = 1
-        self.timer = 0
+        self.speed = 10
+        self.timer = App().now
     def update(self, object):
-        self.timer += 1
-        if self.timer % 10 == 0:
+        self.timer += App().dt
+        if self.timer > 2:
             self.speed *= -1
-        object.x += self.speed
+            self.timer = 0
+        object.x += self.speed*App().dt
         
         image_component = object.get_component("image")
         if self.speed < 0:

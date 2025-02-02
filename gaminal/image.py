@@ -44,7 +44,7 @@ class Image:
             for dy in range(image.height):
                 char = image.data[dx][dy]
                 if char == image.alphachar: continue
-                self.set(x + dx, y + dy, char)
+                self.set(int(x+dx), int(y+dy), char)
     def debug_draw(image):
         print("+", "-" * image.width, "+", sep="")
         for y in range(image.height):
@@ -55,15 +55,6 @@ class Image:
         print("+", "-" * image.width, "+", sep="")
 
 if __name__ == "__main__":
-    def draw(image):
-        print("+", "-" * image.width, "+", sep="")
-        for y in range(image.height):
-            print("|", end="")
-            for x in range(image.width):
-                print(image.data[x][y], end="")
-            print("|")
-        print("+", "-" * image.width, "+", sep="")
-
     image = Image.from_data("""\
  ######
 ##    ##
