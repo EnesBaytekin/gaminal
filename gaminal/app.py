@@ -9,7 +9,7 @@ class App:
         return cls._instance
     def init(self, stdscr):
         self.stdscr = stdscr
-        self.screen = Screen()
+        Screen().init(80, 24)
         self.running = False
         self.scenes = {}
         self.current_scene_name = None
@@ -25,6 +25,7 @@ class App:
     def set_scene(self, name):
         self.current_scene_name = self.scenes[name]
     def run(self):
+        screen = Screen()
         self.now = time()
         last_time = self.now
         self.running = True
@@ -35,9 +36,9 @@ class App:
             # update
             scene.update()
             # draw
-            self.screen.clear()
+            screen.clear()
             scene.draw()
-            self.screen.print(self.stdscr)
+            screen.print(self.stdscr)
             # time management
             elapsed_time = time()-frame_start
             sleep(max(0, 1/self.target_fps-elapsed_time))

@@ -1,9 +1,17 @@
 from gaminal.image import Image
 
 class Screen(Image):
-    def __init__(self, width=80, height=24):
+    _instance = None
+    def __new__(cls):
+        if not cls._instance:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+    def __init__(self):
+        if hasattr(self, "initialized"):
+            self.initialized = True
+            super().__init__(0, 0)
+    def init(self, width, height):
         super().__init__(width, height)
-        self.last_data = [[" " for _ in range(height)] for _ in range(width)]
     def print(self, stdscr):
         terminal_height, terminal_width = stdscr.getmaxyx()
         for x in range(self.width):

@@ -1,8 +1,8 @@
 from gaminal.component import Component
-from gaminal.app import App
+from gaminal.screen import Screen
 
 class ImageComponent(Component):
     def __init__(self, image):
         self.image = image
     def draw(self, object):
-        App().screen.paste(self.image, object.x, object.y)
+        Screen().paste(self.image, object.x, object.y)
