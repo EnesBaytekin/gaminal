@@ -1,4 +1,5 @@
 from gaminal.screen import Screen
+from gaminal.input_manager import InputManager
 from time import sleep, time
 
 class App:
@@ -10,6 +11,7 @@ class App:
     def init(self, stdscr):
         self.stdscr = stdscr
         Screen().init(80, 24)
+        InputManager().init()
         self.running = False
         self.scenes = {}
         self.current_scene_name = None
@@ -26,6 +28,7 @@ class App:
         self.current_scene_name = self.scenes[name]
     def run(self):
         screen = Screen()
+        input_manager = InputManager()
         self.now = time()
         last_time = self.now
         self.running = True
@@ -34,6 +37,7 @@ class App:
             #
             scene = self.scenes[self.current_scene_name]
             # update
+            input_manager.update(self.stdscr)
             scene.update()
             # draw
             screen.clear()
