@@ -9,3 +9,20 @@ from .screen import Screen
 from .util import *
 
 change_dir_to_main_dir()
+
+import curses
+
+def run_app(*scene_file_names):
+    def run(stdscr):
+        curses.curs_set(0)
+        stdscr.nodelay(1)
+        
+        app = App()
+        app.init(stdscr)
+        for scene_file_name in scene_file_names:
+            name = scene_file_name.split(".")[0]
+            scene = Scene.get_scene_from_json(scene_file_name)
+            app.add_scene(name, scene)
+        app.run()
+    curses.wrapper(run)
+

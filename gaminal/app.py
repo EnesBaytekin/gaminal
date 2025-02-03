@@ -7,7 +7,8 @@ class App:
         if not cls._instance:
             cls._instance = super(App, cls).__new__(cls)
         return cls._instance
-    def init(self):
+    def init(self, stdscr):
+        self.stdscr = stdscr
         self.screen = Screen()
         self.running = False
         self.scenes = {}
@@ -36,11 +37,10 @@ class App:
             # draw
             self.screen.clear()
             scene.draw()
-            self.screen.print()
+            self.screen.print(self.stdscr)
             # time management
             elapsed_time = time()-frame_start
             sleep(max(0, 1/self.target_fps-elapsed_time))
             self.now = time()
             self.dt = self.now-last_time
             last_time = self.now
-            
