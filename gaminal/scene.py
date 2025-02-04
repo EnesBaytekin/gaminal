@@ -32,11 +32,7 @@ class Scene:
                     image = Image.from_file(component_data["file"])
                     component = ImageComponent(image)
                     pivot_x = component_data.get("pivot_x", 0)
-                    if pivot_x == "center": pivot_x = image.width//2
-                    elif pivot_x == "end": pivot_x = image.width-1
                     pivot_y = component_data.get("pivot_y", 0)
-                    if pivot_y == "center": pivot_y = image.height//2
-                    elif pivot_y == "end": pivot_y = image.height-1
                     component.set_pivot(pivot_x, pivot_y)
                     object.add_component("image", component)
                 elif component_data["type"] == "animation":

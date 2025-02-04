@@ -2,6 +2,9 @@ from .app import App
 from .component import Component
 from .image_component import ImageComponent
 from .custom_component import CustomComponent
+from .animation_component import AnimationComponent
+from .ysort_component import YSortComponent
+from .animation import Animation
 from .image import Image
 from .object import Object
 from .scene import Scene

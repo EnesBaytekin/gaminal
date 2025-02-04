@@ -6,6 +6,8 @@ class Animation:
         with open(path) as file:
             frames_data = file.read().split("\nnext\n")
         self.images = [Image.from_data(data) for data in frames_data]
+        self.width = max(self.images, key=lambda image: image.width).width
+        self.height = max(self.images, key=lambda image: image.height).height
         self.speed = speed
         self.start_at = App().now
         self.loop = loop

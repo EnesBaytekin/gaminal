@@ -26,6 +26,8 @@ class App:
             self.current_scene_name = name
     def set_scene(self, name):
         self.current_scene_name = self.scenes[name]
+    def get_current_scene(self):
+        return self.scenes[self.current_scene_name]
     def run(self):
         screen = Screen()
         input_manager = InputManager()
@@ -35,7 +37,7 @@ class App:
         while self.running:
             frame_start = time()
             #
-            scene = self.scenes[self.current_scene_name]
+            scene = self.get_current_scene()
             # update
             input_manager.update(self.stdscr)
             scene.update()

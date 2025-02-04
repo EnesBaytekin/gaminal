@@ -13,7 +13,7 @@ class MovementScript:
         app = App()
         object.x += dx*self.hspeed*app.dt
         object.y += dy*self.vspeed*app.dt
-        
+
         image_component = object.get_component("image")
         if dx < 0:
             image_component.image.set(0, 0, "<")
@@ -21,3 +21,12 @@ class MovementScript:
         elif dx > 0:
             image_component.image.set(0, 0, "(")
             image_component.image.set(1, 0, ">")
+
+        if input_manager.is_pressed(ord(" ")):
+            new_object = Object(object.x, object.y-2)
+            animation = Animation("images/fx.anm", speed=10, loop=True)
+            new_object.add_component("animation", AnimationComponent(animation).set_pivot("center", "center"))
+            new_object.add_component("ysort", YSortComponent())
+
+            scene = app.get_current_scene()
+            scene.add_object(new_object)
