@@ -5,11 +5,16 @@
         "components": [
             {
                 "type": "image",
-                "file": "images/player.img"
+                "file": "images/player.img",
+                "pivot_x": "center",
+                "pivot_y": "end"
             },
             {
                 "type": "custom",
                 "file": "MovementScript.py"
+            },
+            {
+                "type": "ysort"
             }
         ]
     },
@@ -19,7 +24,12 @@
         "components": [
             {
                 "type": "image",
-                "file": "images/player.img"
+                "file": "images/player.img",
+                "pivot_x": "center",
+                "pivot_y": "end"
+            },
+            {
+                "type": "ysort"
             }
         ]
     },
@@ -29,7 +39,12 @@
         "components": [
             {
                 "type": "image",
-                "file": "images/box.img"
+                "file": "images/box.img",
+                "pivot_x": "center",
+                "pivot_y": "end"
+            },
+            {
+                "type": "ysort"
             }
         ]
     },
@@ -39,17 +54,27 @@
         "components": [
             {
                 "type": "image",
-                "file": "images/tree.img"
+                "file": "images/tree.img",
+                "pivot_x": "center",
+                "pivot_y": "end"
+            },
+            {
+                "type": "ysort"
             }
         ]
     },
     {
-        "x": 25,
-        "y": 4,
+        "x": 30,
+        "y": 16,
         "components": [
             {
                 "type": "image",
-                "file": "images/tower.img"
+                "file": "images/tower.img",
+                "pivot_x": "center",
+                "pivot_y": "end"
+            },
+            {
+                "type": "ysort"
             }
         ]
     },
@@ -62,6 +87,9 @@
                 "file": "images/fx.anm",
                 "speed": 10,
                 "loop": true
+            },
+            {
+                "type": "ysort"
             }
         ]
     }
