@@ -16,8 +16,13 @@ class Scene:
         for object in sorted(self.objects, key=lambda obj: obj.depth):
             object.draw()
     def update(self):
+        dead_objects = []
         for object in self.objects:
             object.update()
+            if object.dead:
+                dead_objects.append(object)
+        for object in dead_objects:
+            self.objects.remove(object)
     @classmethod
     def get_scene_from_json(cls, json_file):
         scene = cls()
@@ -39,7 +44,8 @@ class Scene:
                     animation = Animation(component_data["file"], component_data.get("speed", 1), component_data.get("loop", True))
                     object.add_component("animation", AnimationComponent(animation))
                 elif component_data["type"] == "custom":
-                    object.add_component(component_data["file"], CustomComponent(component_data["file"]))
+                    component = CustomComponent(component_data["file"], component_data.get("args", ()))
+                    object.add_component(component_data["file"], component)
                 elif component_data["type"] == "ysort":
                     object.add_component("ysort", YSortComponent())
 

@@ -5,6 +5,9 @@ class Object:
         self.x = x
         self.y = y
         self.components = {}
+        self.dead = False
+    def kill(self):
+        self.dead = True
     def add_component(self, name, component):
         self.components[name] = component
     def get_component(self, name):

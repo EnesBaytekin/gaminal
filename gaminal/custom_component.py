@@ -2,10 +2,10 @@ from gaminal.component import Component
 from importlib import import_module
 
 class CustomComponent(Component):
-    def __init__(self, file_name):
+    def __init__(self, file_name, args):
         self.script = import_module(file_name.split(".")[0])
         class_name = file_name.split(".")[0]
-        self.instance = getattr(self.script, class_name)()
+        self.instance = getattr(self.script, class_name)(*args)
     def draw(self, object):
         if hasattr(self.instance, 'draw'):
             self.instance.draw(object)
