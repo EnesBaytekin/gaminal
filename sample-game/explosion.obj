@@ -1,0 +1,20 @@
+{
+    "components": [
+        {
+            "type": "animation",
+            "file": "images/fx.anm",
+            "speed": 10,
+            "loop": true,
+            "pivot_x": "center",
+            "pivot_y": "end"
+        },
+        {
+            "type": "custom",
+            "file": "ExplosionScript.py",
+            "args": [0.7]
+        },
+        {
+            "type": "ysort"
+        }
+    ]
+}

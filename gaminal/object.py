@@ -4,6 +4,7 @@ from gaminal.animation import Animation
 from gaminal.animation_component import AnimationComponent
 from gaminal.custom_component import CustomComponent
 from gaminal.ysort_component import YSortComponent
+from json import load
 
 class Object:
     def __init__(self, x, y):
@@ -12,8 +13,11 @@ class Object:
         self.components = {}
         self.dead = False
     @classmethod
-    def from_data(cls, object_data):
-        object = cls(object_data["x"], object_data["y"])
+    def from_file(cls, file_name, x, y):
+        return cls.from_data(load(open(file_name)), x, y)
+    @classmethod
+    def from_data(cls, object_data, x, y):
+        object = cls(x, y)
         for component_data in object_data["components"]:
             if component_data["type"] == "image":
                 image = Image.from_file(component_data["file"])

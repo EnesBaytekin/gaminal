@@ -22,9 +22,10 @@ class Scene:
         scene = cls()
 
         scene_data = load(open(json_file))
-
         for object_data in scene_data:
-            object = Object.from_data(object_data)
+            x = float(object_data["x"])
+            y = float(object_data["y"])
+            object = Object.from_data(object_data, x, y)
             scene.add_object(object)
 
         return scene

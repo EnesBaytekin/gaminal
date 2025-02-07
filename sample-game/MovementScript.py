@@ -26,11 +26,7 @@ class MovementScript:
             image_component.image.set(1, 0, ">")
 
         if input_manager.is_pressed(ord(" ")):
-            new_object = Object(object.x+self.direction*3, object.y)
-            animation = Animation("images/fx.anm", speed=10, loop=True)
-            new_object.add_component("animation", AnimationComponent(animation).set_pivot("center", "end"))
-            new_object.add_component("ysort", YSortComponent())
-            new_object.add_component("custom", CustomComponent("ExplosionScript.py", [0.7]))
-
+            new_object = Object.from_file("explosion.obj", object.x+self.direction*3, object.y)
+            
             scene = app.get_current_scene()
             scene.add_object(new_object)
