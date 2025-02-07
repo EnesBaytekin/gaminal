@@ -42,7 +42,11 @@ class Scene:
                     object.add_component("image", component)
                 elif component_data["type"] == "animation":
                     animation = Animation(component_data["file"], component_data.get("speed", 1), component_data.get("loop", True))
-                    object.add_component("animation", AnimationComponent(animation))
+                    component = AnimationComponent(animation)
+                    pivot_x = component_data.get("pivot_x", 0)
+                    pivot_y = component_data.get("pivot_y", 0)
+                    component.set_pivot(pivot_x, pivot_y)
+                    object.add_component("animation", component)
                 elif component_data["type"] == "custom":
                     component = CustomComponent(component_data["file"], component_data.get("args", ()))
                     object.add_component(component_data["file"], component)
