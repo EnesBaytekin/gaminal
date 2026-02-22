@@ -1,96 +1,104 @@
-[
+{
+  "width": 800,
+  "height": 600,
+  "background_color": "#222222",
+  "objects": [
     {
-        "x": 45,
-        "y": 15,
-        "components": [
-            {
-                "type": "image",
-                "file": "images/player.img",
-                "pivot_x": "center",
-                "pivot_y": "end"
-            },
-            {
-                "type": "custom",
-                "file": "MovementScript.py"
-            },
-            {
-                "type": "ysort"
-            }
-        ]
+      "x": 400,
+      "y": 300,
+      "components": [
+        {
+          "type": "image",
+          "file": "images/player.png",
+          "pivot_x": "center",
+          "pivot_y": "end"
+        },
+        {
+          "type": "custom",
+          "file": "MovementScript.py"
+        },
+        {
+          "type": "ysort"
+        }
+      ]
     },
     {
-        "x": 12,
-        "y": 17,
-        "components": [
-            {
-                "type": "image",
-                "file": "images/player.img",
-                "pivot_x": "center",
-                "pivot_y": "end"
-            },
-            {
-                "type": "ysort"
-            }
-        ]
+      "x": 200,
+      "y": 400,
+      "components": [
+        {
+          "type": "image",
+          "file": "images/player.png",
+          "pivot_x": "center",
+          "pivot_y": "end"
+        },
+        {
+          "type": "ysort"
+        }
+      ]
     },
     {
-        "x": 5,
-        "y": 16,
-        "components": [
-            {
-                "type": "image",
-                "file": "images/box.img",
-                "pivot_x": "center",
-                "pivot_y": "end"
-            },
-            {
-                "type": "ysort"
-            }
-        ]
+      "x": 100,
+      "y": 350,
+      "components": [
+        {
+          "type": "image",
+          "file": "images/box.png",
+          "pivot_x": "center",
+          "pivot_y": "end"
+        },
+        {
+          "type": "ysort"
+        }
+      ]
     },
     {
-        "x": 15,
-        "y": 10,
-        "components": [
-            {
-                "type": "image",
-                "file": "images/tree.img",
-                "pivot_x": "center",
-                "pivot_y": "end"
-            },
-            {
-                "type": "ysort"
-            }
-        ]
+      "x": 600,
+      "y": 300,
+      "components": [
+        {
+          "type": "image",
+          "file": "images/tree.png",
+          "pivot_x": "center",
+          "pivot_y": "end"
+        },
+        {
+          "type": "ysort"
+        }
+      ]
     },
     {
-        "x": 30,
-        "y": 16,
-        "components": [
-            {
-                "type": "image",
-                "file": "images/tower.img",
-                "pivot_x": "center",
-                "pivot_y": "end"
-            },
-            {
-                "type": "ysort"
-            }
-        ]
+      "x": 500,
+      "y": 450,
+      "components": [
+        {
+          "type": "image",
+          "file": "images/tower.png",
+          "pivot_x": "center",
+          "pivot_y": "end"
+        },
+        {
+          "type": "ysort"
+        }
+      ]
     },
     {
-        "x": 4,
-        "y": 2,
-        "components": [
-            {
-                "type": "animation",
-                "file": "images/fx.anm",
-                "speed": 10,
-                "loop": true
-            },
-            {
-                "type": "ysort"
-            }
-        ]
+      "x": 300,
+      "y": 200,
+      "components": [
+        {
+          "type": "animation",
+          "file": "images/fx.png",
+          "frame_width": 32,
+          "frame_height": 32,
+          "frames": [0, 1, 2, 3],
+          "speed": 5,
+          "loop": true
+        },
+        {
+          "type": "ysort"
+        }
+      ]
     }
-]
+  ]
+}

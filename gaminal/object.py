@@ -6,15 +6,18 @@ from gaminal.custom_component import CustomComponent
 from gaminal.ysort_component import YSortComponent
 from json import load
 
+
 class Object:
     def __init__(self, x, y):
         self.x = x
         self.y = y
         self.components = {}
         self.dead = False
+
     @classmethod
     def from_file(cls, file_name, x, y):
         return cls.from_data(load(open(file_name)), x, y)
+
     @classmethod
     def from_data(cls, object_data, x, y):
         object = cls(x, y)
@@ -27,7 +30,26 @@ class Object:
                 component.set_pivot(pivot_x, pivot_y)
                 object.add_component("image", component)
             elif component_data["type"] == "animation":
-                animation = Animation(component_data["file"], component_data.get("speed", 1), component_data.get("loop", True))
+                # Support sprite sheet format
+                if "frame_width" in component_data and "frame_height" in component_data:
+                    frames = component_data.get("frames")
+                    speed = component_data.get("speed", 1)
+                    loop = component_data.get("loop", True)
+                    animation = Animation.from_sprite_sheet(
+                        component_data["file"],
+                        component_data["frame_width"],
+                        component_data["frame_height"],
+                        frames,
+                        speed,
+                        loop
+                    )
+                else:
+                    # Legacy support for frame lists
+                    animation = Animation(
+                        component_data["file"],
+                        component_data.get("speed", 1),
+                        component_data.get("loop", True)
+                    )
                 component = AnimationComponent(animation)
                 pivot_x = component_data.get("pivot_x", 0)
                 pivot_y = component_data.get("pivot_y", 0)
@@ -39,15 +61,20 @@ class Object:
             elif component_data["type"] == "ysort":
                 object.add_component("ysort", YSortComponent())
         return object
+
     def kill(self):
         self.dead = True
+
     def add_component(self, name, component):
         self.components[name] = component
+
     def get_component(self, name):
         return self.components[name]
+
     def draw(self):
         for component in self.components.values():
             component.draw(self)
+
     def update(self):
         for component in self.components.values():
             component.update(self)
