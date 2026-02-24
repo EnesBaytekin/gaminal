@@ -25,21 +25,22 @@ class Object:
             component = ScriptComponent(file_name, args)
 
             # Add component with name (explicit or auto-generated)
-            object.add_component(file_name, component, explicit_name=name)
+            object.add_component(component, explicit_name=name)
         return object
 
     def kill(self):
         self.dead = True
 
-    def add_component(self, file_name, component, explicit_name=None):
+    def add_component(self, component, explicit_name=None):
         """
         Add a component to this object.
 
         Args:
-            file_name: Component file name (type identifier)
             component: ScriptComponent instance
-            explicit_name: Optional explicit name. If not provided, generates from file_name.
+            explicit_name: Optional explicit name. If not provided, generates from component.file_name.
         """
+        file_name = component.file_name
+
         if explicit_name:
             # Use provided name directly
             name = explicit_name
