@@ -1,9 +1,4 @@
-from pygaminal.image import Image
-from pygaminal.image_component import ImageComponent
-from pygaminal.animation import Animation
-from pygaminal.animation_component import AnimationComponent
-from pygaminal.custom_component import CustomComponent
-from pygaminal.ysort_component import YSortComponent
+from pygaminal.script_component import ScriptComponent
 from json import load
 
 
@@ -22,44 +17,18 @@ class Object:
     def from_data(cls, object_data, x, y):
         object = cls(x, y)
         for component_data in object_data["components"]:
-            if component_data["type"] == "image":
-                image = Image.from_file(component_data["file"])
-                component = ImageComponent(image)
-                pivot_x = component_data.get("pivot_x", 0)
-                pivot_y = component_data.get("pivot_y", 0)
-                component.set_pivot(pivot_x, pivot_y)
-                object.add_component("image", component)
-            elif component_data["type"] == "animation":
-                # Support sprite sheet format
-                if "frame_width" in component_data and "frame_height" in component_data:
-                    frames = component_data.get("frames")
-                    speed = component_data.get("speed", 1)
-                    loop = component_data.get("loop", True)
-                    animation = Animation.from_sprite_sheet(
-                        component_data["file"],
-                        component_data["frame_width"],
-                        component_data["frame_height"],
-                        frames,
-                        speed,
-                        loop
-                    )
-                else:
-                    # Legacy support for frame lists
-                    animation = Animation(
-                        component_data["file"],
-                        component_data.get("speed", 1),
-                        component_data.get("loop", True)
-                    )
-                component = AnimationComponent(animation)
-                pivot_x = component_data.get("pivot_x", 0)
-                pivot_y = component_data.get("pivot_y", 0)
-                component.set_pivot(pivot_x, pivot_y)
-                object.add_component("animation", component)
-            elif component_data["type"] == "custom":
-                component = CustomComponent(component_data["file"], component_data.get("args", ()))
-                object.add_component(component_data["file"], component)
-            elif component_data["type"] == "ysort":
-                object.add_component("ysort", YSortComponent())
+            file_name = component_data["file"]
+            args = component_data.get("args", ())
+
+            # Load component using ScriptComponent
+            component = ScriptComponent(file_name, args)
+
+            # Use file_name as component key (without @ and path)
+            key = file_name.split("/")[-1].split("\\")[-1]
+            if key.startswith("@"):
+                key = key[1:]
+
+            object.add_component(key, component)
         return object
 
     def kill(self):

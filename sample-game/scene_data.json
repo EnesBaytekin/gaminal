@@ -8,17 +8,16 @@
       "y": 300,
       "components": [
         {
-          "type": "image",
-          "file": "images/player.png",
-          "pivot_x": "center",
-          "pivot_y": "end"
+          "file": "@ImageComponent",
+          "args": ["images/player.png", "center", "end"]
         },
         {
-          "type": "custom",
-          "file": "MovementScript.py"
+          "file": "MovementScript",
+          "args": []
         },
         {
-          "type": "ysort"
+          "file": "@YSortComponent",
+          "args": []
         }
       ]
     },
@@ -27,13 +26,12 @@
       "y": 400,
       "components": [
         {
-          "type": "image",
-          "file": "images/player.png",
-          "pivot_x": "center",
-          "pivot_y": "end"
+          "file": "@ImageComponent",
+          "args": ["images/player.png", "center", "end"]
         },
         {
-          "type": "ysort"
+          "file": "@YSortComponent",
+          "args": []
         }
       ]
     },
@@ -42,13 +40,12 @@
       "y": 350,
       "components": [
         {
-          "type": "image",
-          "file": "images/box.png",
-          "pivot_x": "center",
-          "pivot_y": "end"
+          "file": "@ImageComponent",
+          "args": ["images/box.png", "center", "end"]
         },
         {
-          "type": "ysort"
+          "file": "@YSortComponent",
+          "args": []
         }
       ]
     },
@@ -57,13 +54,12 @@
       "y": 300,
       "components": [
         {
-          "type": "image",
-          "file": "images/tree.png",
-          "pivot_x": "center",
-          "pivot_y": "end"
+          "file": "@ImageComponent",
+          "args": ["images/tree.png", "center", "end"]
         },
         {
-          "type": "ysort"
+          "file": "@YSortComponent",
+          "args": []
         }
       ]
     },
@@ -72,13 +68,12 @@
       "y": 450,
       "components": [
         {
-          "type": "image",
-          "file": "images/tower.png",
-          "pivot_x": "center",
-          "pivot_y": "end"
+          "file": "@ImageComponent",
+          "args": ["images/tower.png", "center", "end"]
         },
         {
-          "type": "ysort"
+          "file": "@YSortComponent",
+          "args": []
         }
       ]
     },
@@ -87,16 +82,12 @@
       "y": 200,
       "components": [
         {
-          "type": "animation",
-          "file": "images/fx.png",
-          "frame_width": 32,
-          "frame_height": 32,
-          "frames": [0, 1, 2, 3],
-          "speed": 5,
-          "loop": true
+          "file": "@AnimationComponent",
+          "args": [{"file": "images/fx.png", "frame_width": 32, "frame_height": 32, "frames": [0, 1, 2, 3], "speed": 5, "loop": true}]
         },
         {
-          "type": "ysort"
+          "file": "@YSortComponent",
+          "args": []
         }
       ]
     }
