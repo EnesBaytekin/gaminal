@@ -1,4 +1,4 @@
-from gaminal import *
+from pygaminal import *
 
 class ExplosionScript:
     def __init__(self, duration):

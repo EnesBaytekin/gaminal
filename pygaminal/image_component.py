@@ -1,5 +1,5 @@
-from gaminal.component import Component
-from gaminal.screen import Screen
+from pygaminal.component import Component
+from pygaminal.screen import Screen
 
 
 class ImageComponent(Component):

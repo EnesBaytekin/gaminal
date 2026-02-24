@@ -1,6 +1,6 @@
 import pygame
-from gaminal.screen import Screen
-from gaminal.input_manager import InputManager
+from pygaminal.screen import Screen
+from pygaminal.input_manager import InputManager
 from time import time
 
 

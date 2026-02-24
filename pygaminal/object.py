@@ -1,9 +1,9 @@
-from gaminal.image import Image
-from gaminal.image_component import ImageComponent
-from gaminal.animation import Animation
-from gaminal.animation_component import AnimationComponent
-from gaminal.custom_component import CustomComponent
-from gaminal.ysort_component import YSortComponent
+from pygaminal.image import Image
+from pygaminal.image_component import ImageComponent
+from pygaminal.animation import Animation
+from pygaminal.animation_component import AnimationComponent
+from pygaminal.custom_component import CustomComponent
+from pygaminal.ysort_component import YSortComponent
 from json import load
 
 

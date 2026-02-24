@@ -1,4 +1,4 @@
-from gaminal.object import Object
+from pygaminal.object import Object
 from json import load
 
 

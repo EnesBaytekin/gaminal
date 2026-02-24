@@ -1,4 +1,4 @@
-from gaminal.component import Component
+from pygaminal.component import Component
 
 class YSortComponent(Component):
     def update(self, object):

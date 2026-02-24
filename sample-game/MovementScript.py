@@ -1,5 +1,5 @@
 import pygame
-from gaminal import *
+from pygaminal import *
 
 
 class MovementScript:

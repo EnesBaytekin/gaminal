@@ -32,7 +32,7 @@ class InputManager:
         # Process pygame events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                from gaminal.app import App
+                from pygaminal.app import App
                 App().stop()
             elif event.type == pygame.KEYDOWN:
                 self.pressed_keys.add(event.key)

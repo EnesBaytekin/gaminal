@@ -1,4 +1,4 @@
-from gaminal.component import Component
+from pygaminal.component import Component
 from importlib import import_module
 
 class CustomComponent(Component):

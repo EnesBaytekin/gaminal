@@ -34,7 +34,7 @@ class Screen:
         self.background_image = None
 
     def set_background_image(self, image_path):
-        from gaminal.image import Image
+        from pygaminal.image import Image
         self.background_image = Image.from_file(image_path)
 
     def clear(self):

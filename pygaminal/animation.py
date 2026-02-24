@@ -1,6 +1,6 @@
 import pygame
-from gaminal.image import Image
-from gaminal.app import App
+from pygaminal.image import Image
+from pygaminal.app import App
 
 
 class Animation:
