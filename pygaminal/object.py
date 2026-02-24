@@ -3,11 +3,56 @@ from json import load
 
 
 class Object:
-    def __init__(self, x, y):
+    _id_counter = 0
+
+    def __init__(self, x, y, name=None, tags=None):
         self.x = x
         self.y = y
+        self.name = self._generate_name(name)
+        self.tags = set(tags or [])
         self.components = {}  # {name: ScriptComponent}
         self.dead = False
+
+        # Pending updates for scene sync (applied at end of frame)
+        self._pending_tag_adds = set()
+        self._pending_tag_removes = set()
+
+    def _generate_name(self, name):
+        """Generate a unique name for the object."""
+        if name:
+            return name
+        generated = f"object_{Object._id_counter}"
+        Object._id_counter += 1
+        return generated
+
+    def add_tag(self, tag):
+        """Add a tag to this object. Takes effect in next frame for scene queries."""
+        if tag in self.tags:
+            return
+        self.tags.add(tag)
+        self._pending_tag_adds.add(tag)
+        self._pending_tag_removes.discard(tag)
+
+    def remove_tag(self, tag):
+        """Remove a tag from this object. Takes effect in next frame for scene queries."""
+        if tag not in self.tags:
+            return
+        self.tags.remove(tag)
+        self._pending_tag_removes.add(tag)
+        self._pending_tag_adds.discard(tag)
+
+    def has_tag(self, tag):
+        """Check if object has a specific tag. Works immediately."""
+        return tag in self.tags
+
+    def kill(self):
+        """Mark object for removal at end of frame."""
+        self.dead = True
+
+    def _clear_pending_updates(self):
+        """Clear pending updates (called by scene after applying)."""
+        self._pending_tag_adds.clear()
+        self._pending_tag_removes.clear()
 
     @classmethod
     def from_file(cls, file_name, x, y):
@@ -15,21 +60,22 @@ class Object:
 
     @classmethod
     def from_data(cls, object_data, x, y):
-        object = cls(x, y)
+        name = object_data.get("name")
+        tags = object_data.get("tags")
+
+        object = cls(x, y, name=name, tags=tags)
+
         for component_data in object_data["components"]:
             file_name = component_data["file"]
-            name = component_data.get("name")  # Optional explicit name
+            comp_name = component_data.get("name")  # Optional explicit name
             args = component_data.get("args", ())
 
             # Load component using ScriptComponent
             component = ScriptComponent(file_name, args)
 
             # Add component with name (explicit or auto-generated)
-            object.add_component(component, explicit_name=name)
+            object.add_component(component, explicit_name=comp_name)
         return object
-
-    def kill(self):
-        self.dead = True
 
     def add_component(self, component, explicit_name=None):
         """

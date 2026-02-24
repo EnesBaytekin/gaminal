@@ -6,6 +6,8 @@
     {
       "x": 400,
       "y": 300,
+      "name": "player",
+      "tags": ["hero", "controllable"],
       "components": [
         {
           "file": "@ImageComponent",
@@ -24,6 +26,8 @@
     {
       "x": 200,
       "y": 400,
+      "name": "npc1",
+      "tags": ["npc"],
       "components": [
         {
           "file": "@ImageComponent",
@@ -38,6 +42,8 @@
     {
       "x": 100,
       "y": 350,
+      "name": "box1",
+      "tags": ["obstacle", "destructible"],
       "components": [
         {
           "file": "@ImageComponent",
@@ -52,6 +58,8 @@
     {
       "x": 600,
       "y": 300,
+      "name": "tree1",
+      "tags": ["decoration"],
       "components": [
         {
           "file": "@ImageComponent",
@@ -66,6 +74,8 @@
     {
       "x": 500,
       "y": 450,
+      "name": "tower1",
+      "tags": ["building"],
       "components": [
         {
           "file": "@ImageComponent",
@@ -80,6 +90,7 @@
     {
       "x": 300,
       "y": 200,
+      "tags": ["effect"],
       "components": [
         {
           "file": "@AnimationComponent",
