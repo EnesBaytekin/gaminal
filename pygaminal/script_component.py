@@ -15,7 +15,7 @@ class ScriptComponent(Component):
                        - Otherwise: loads from user scripts directory
             args: Arguments to pass to component constructor
         """
-        self.file_name = file_name
+        self.file_name = file_name  # Store file name for type-based retrieval
 
         # Determine if built-in or user script
         if file_name.startswith("@"):
