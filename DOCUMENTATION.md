@@ -6,28 +6,27 @@ Pygame tabanlı 2D oyun yapma framework'ü. JSON + assetler ile oyun geliştirme
 
 ```
 pygamer/
-├── gaminal/                    # Core engine
-│   ├── __init__.py            # run_app() fonksiyonu
-│   ├── app.py                 # Singleton: Ana oyun döngüsü
-│   ├── scene.py               # Singleton: Sahne yönetimi
-│   ├── object.py              # Entity-Component System
-│   ├── component.py           # Base Component
-│   ├── image.py               # PNG/JPG yükleme
-│   ├── image_component.py    # Sprite çizim
-│   ├── animation.py           # Animasyon sistemi
-│   ├── animation_component.py # Animasyon çizim
-│   ├── custom_component.py   # Python script entegrasyonu
-│   ├── ysort_component.py    # Y eksenine göre depth sorting
-│   ├── screen.py              # Singleton: Pygame Surface yönetimi
-│   ├── input_manager.py       # Singleton: Input handling
-│   └── util.py                # Yardımcı fonksiyonlar
-└── sample-game/               # Örnek oyun
-    ├── scene_data.json        # Sahne tanımı
-    ├── main.py                # Entry point
-    ├── MovementScript.py      # Custom script
-    ├── ExplosionScript.py     # Custom script
-    ├── explosion.obj          # Object template
-    └── images/                # Assetler (PNG)
+├── pygaminal/                     # Core engine
+│   ├── __init__.py               # run_app() fonksiyonu
+│   ├── app.py                    # Singleton: Ana oyun döngüsü
+│   ├── scene.py                  # Singleton: Sahne yönetimi
+│   ├── object.py                 # Entity-Component System
+│   ├── component.py              # Base Component
+│   ├── script_component.py       # Universal component loader
+│   ├── components/               # Built-in component script'leri
+│   │   ├── ImageComponent.py    # Sprite çizim
+│   │   ├── AnimationComponent.py # Animasyon çizim
+│   │   └── YSortComponent.py    # Y eksenine göre depth sorting
+│   ├── image.py                  # PNG/JPG yükleme
+│   ├── animation.py              # Animasyon sistemi
+│   ├── screen.py                 # Singleton: Pygame Surface yönetimi
+│   ├── input_manager.py          # Singleton: Input handling
+│   └── util.py                   # Yardımcı fonksiyonlar
+└── sample-game/                  # Örnek oyun
+    ├── scene_data.json           # Sahne tanımı
+    ├── main.py                   # Entry point
+    ├── MovementScript.py         # Custom script
+    └── images/                   # Assetler (PNG)
 ```
 
 ## Core Sınıflar
@@ -36,7 +35,7 @@ pygamer/
 Ana uygulama yöneticisi.
 
 ```python
-from gaminal import App
+from pygaminal import App
 app = App()
 app.init(width=800, height=600, title="My Game")
 app.run()
@@ -58,7 +57,7 @@ app.run()
 Render yüzeyi.
 
 ```python
-from gaminal import Screen
+from pygaminal import Screen
 screen = Screen()
 screen.init(800, 600)
 screen.set_background_color("#3366ff")
@@ -72,7 +71,7 @@ screen.refresh()  # Display güncelle
 Input yönetimi.
 
 ```python
-from gaminal import InputManager
+from pygaminal import InputManager
 import pygame
 
 im = InputManager()
@@ -88,7 +87,7 @@ if im.is_released(pygame.K_a):  # Bırakıldı mı
 Objeleri tutan konteyner.
 
 ```python
-from gaminal import Scene
+from pygaminal import Scene
 
 scene = Scene()
 scene.add_object(obj)  # Obje ekle
@@ -105,11 +104,10 @@ scene.draw()  # Tüm objeleri çiz
 Entity-Component mimarisi.
 
 ```python
-from gaminal import Object
+from pygaminal import Object
 
 obj = Object(x, y)
-obj.add_component("image", image_component)
-obj.add_component("custom", custom_component)
+obj.add_component(component)
 obj.kill()  # Objeyi yok et (sahneden sil)
 ```
 
@@ -118,14 +116,240 @@ obj.kill()  # Objeyi yok et (sahneden sil)
 - `dead` - Öldü mü?
 - `depth` - Çizim derinliği (YSortComponent ile otomatik)
 
+**Metodlar:**
+- `add_component(component, explicit_name=None)` - Component ekle
+- `get_component(name)` - İsmi verilen component'i al
+- `get_components(file_name)` - Tüm aynı türdeki component'leri al
+
+## Component Sistemi
+
+### Uniform Component Yapısı
+
+Tüm component'ler **aynı format**ta script dosyalarıdır. Built-in component'ler ve user script'ler arasında fark yoktur.
+
+#### Built-in Component'ler
+Framework ile birlikte gelen component'ler. `@` prefix'i ile kullanılır:
+
+```json
+{"file": "@ImageComponent", "args": [...]}
+{"file": "@AnimationComponent", "args": [...]}
+{"file": "@YSortComponent", "args": []}
+```
+
+#### User-Defined Component'ler
+Kullanıcının yazdığı script'ler. Dosya adı ile kullanılır:
+
+```json
+{"file": "MovementScript", "args": [200]}
+{"file": "MyScript", "args": []}
+```
+
+### Component Script Formatı
+
+Her component script'i aynı yapıdadır - **inheritance gerekmez**:
+
+```python
+# MyComponent.py
+class MyComponent:
+    def __init__(self, arg1, arg2=None):
+        # Constructor
+        self.value = arg1
+
+    def update(self, obj):
+        # Her frame çağrılır
+        obj.x += 100 * app.dt
+
+    def draw(self, obj):
+        # Çizim anında çağrılır (opsiyonel)
+        pass
+```
+
+### Built-in Component'ler
+
+#### ImageComponent
+Tek frame çizim.
+
+```python
+# JSON
+{
+  "file": "@ImageComponent",
+  "name": "body",  // Optional
+  "args": ["player.png", "center", "end"]
+}
+```
+
+**Args:**
+1. `image_or_path` - Image objesi veya dosya yolu
+2. `pivot_x` - "center", "end", veya pixel değeri
+3. `pivot_y` - "center", "end", veya pixel değeri
+
+#### AnimationComponent
+Animasyon çizim.
+
+```python
+# JSON
+{
+  "file": "@AnimationComponent",
+  "args": [{
+    "file": "walk.png",
+    "frame_width": 32,
+    "frame_height": 32,
+    "frames": [0, 1, 2, 3],
+    "speed": 10,
+    "loop": true
+  }]
+}
+```
+
+**Args:**
+- Animasyon data dict'i:
+  - `file` - Sprite sheet dosya yolu
+  - `frame_width` - Frame genişliği
+  - `frame_height` - Frame yüksekliği
+  - `frames` - Frame listesi (opsiyonel)
+  - `speed` - Animasyon hızı
+  - `loop` - Döngü mü?
+
+#### YSortComponent
+Y pozisyonuna göre depth ayarlama (derinlik sıralaması için).
+
+```python
+// JSON
+{
+  "file": "@YSortComponent",
+  "args": []
+}
+```
+
+## JSON Formatı
+
+### Uniform Component Formatı
+
+Tüm component'ler aynı formattadır:
+
+```json
+{
+  "file": "ComponentName",      // Zorunlu: Component dosyası
+  "name": "my_component",       // Opsiyonel: Unique isim
+  "args": [arg1, arg2, ...]     // Opsiyonel: Constructor argümanları
+}
+```
+
+### Component Kuralları
+
+1. **`file`** - Zorunlu
+   - `@` ile başlarsa → Built-in component (`@ImageComponent`)
+   - `@` yoksa → User script (`MovementScript`)
+
+2. **`name`** - Opsiyonel
+   - Verilirse → Bu isimle eklenir
+   - Verilmezse → Otomatik isim (`ImageComponent`, `ImageComponent2`, ...)
+
+3. **`args`** - Opsiyonel
+   - Component constructor'ına geçilecek parametreler
+
+### Sahne Dosyası (scene_data.json)
+
+```json
+{
+  "width": 800,
+  "height": 600,
+  "background_color": "#222222",
+  "background_image": "bg.png",
+  "objects": [
+    {
+      "x": 100,
+      "y": 200,
+      "components": [
+        {
+          "file": "@ImageComponent",
+          "name": "body",
+          "args": ["images/player.png", "center", "end"]
+        },
+        {
+          "file": "MovementScript",
+          "args": [200]
+        },
+        {
+          "file": "@YSortComponent",
+          "args": []
+        }
+      ]
+    },
+    {
+      "x": 300,
+      "y": 150,
+      "components": [
+        {
+          "file": "@AnimationComponent",
+          "args": [{
+            "file": "images/explosion.png",
+            "frame_width": 32,
+            "frame_height": 32,
+            "frames": [0, 1, 2, 3],
+            "speed": 10,
+            "loop": false
+          }]
+        }
+      ]
+    }
+  ]
+}
+```
+
+## Multiple Components
+
+Aynı objeye birden fazla aynı türden component eklenebilir:
+
+### Auto-Naming (isim verilmezse)
+
+```json
+{
+  "components": [
+    {"file": "@ImageComponent", "args": ["layer1.png"]},
+    {"file": "@ImageComponent", "args": ["layer2.png"]},
+    {"file": "@ImageComponent", "args": ["layer3.png"]}
+  ]
+}
+```
+
+Sonuç: `ImageComponent`, `ImageComponent2`, `ImageComponent3`
+
+### Explicit Naming (isim verilirse)
+
+```json
+{
+  "components": [
+    {"file": "@ImageComponent", "name": "shadow", "args": ["shadow.png"]},
+    {"file": "@ImageComponent", "name": "body", "args": ["body.png"]},
+    {"file": "@ImageComponent", "name": "glow", "args": ["glow.png"]}
+  ]
+}
+```
+
+Sonuç: `shadow`, `body`, `glow`
+
+### Component Erişimi
+
+```python
+# Tek component (unique name ile)
+comp = obj.get_component("body")
+
+// Tüm aynı türdeki component'ler
+images = obj.get_components("@ImageComponent")  // List of components
+scripts = obj.get_components("MovementScript")   // List of components
+```
+
+## Image & Animation
+
 ### Image
 Resim yükleme.
 
 ```python
-from gaminal import Image
+from pygaminal import Image
 
 img = Image.from_file("sprite.png")
-# img.width, img.height
+// img.width, img.height
 ```
 
 ### Animation
@@ -133,13 +357,13 @@ Animasyon sistemi.
 
 **Sprite Sheet:**
 ```python
-from gaminal import Animation
+from pygaminal import Animation
 
 anim = Animation.from_sprite_sheet(
     "sprite.png",
     frame_width=32,
     frame_height=32,
-    frames=[0, 1, 2, 3],  # Optional, None = tüm frame'ler
+    frames=[0, 1, 2, 3],  // Optional, None = tüm frame'ler
     speed=10,
     loop=True
 )
@@ -159,187 +383,43 @@ anim = Animation.from_files([
 - `get_frame()` - Şu anki frame'i al
 - `is_over()` - Bitti mi?
 
-## Component'ler
-
-### ImageComponent
-Tek frame çizim.
-
-```python
-from gaminal import Image, ImageComponent
-
-img = Image.from_file("player.png")
-comp = ImageComponent(img)
-comp.set_pivot("center", "end")  # Pivot noktası
-# "center", "end" veya pixel değeri
-```
-
-### AnimationComponent
-Animasyon çizim.
-
-```python
-from gaminal import Animation, AnimationComponent
-
-anim = Animation.from_sprite_sheet("walk.png", 32, 32, speed=8)
-comp = AnimationComponent(anim)
-comp.set_pivot("center", "end")
-```
-
-### CustomComponent
-Python script entegrasyonu.
-
-Script dosyası (`MovementScript.py`):
-```python
-import pygame
-from gaminal import *
-
-class MovementScript:
-    def __init__(self):
-        self.speed = 200
-
-    def update(self, object):
-        app = App()
-        im = InputManager()
-
-        if im.is_pressed(pygame.K_d):
-            object.x += self.speed * app.dt
-        if im.is_pressed(pygame.K_a):
-            object.x -= self.speed * app.dt
-```
-
-### YSortComponent
-Y pozisyonuna göre depth ayarlama (derinlik sıralaması için).
-
-```python
-from gaminal import YSortComponent
-obj.add_component("ysort", YSortComponent())
-```
-
-## JSON Formatı
-
-### Sahne Dosyası (scene_data.json)
-
-```json
-{
-  "width": 800,
-  "height": 600,
-  "background_color": "#222222",
-  "background_image": "bg.png",
-  "objects": [
-    {
-      "x": 100,
-      "y": 200,
-      "components": [
-        {
-          "type": "image",
-          "file": "images/player.png",
-          "pivot_x": "center",
-          "pivot_y": "end"
-        },
-        {
-          "type": "custom",
-          "file": "MovementScript.py"
-        },
-        {
-          "type": "ysort"
-        }
-      ]
-    },
-    {
-      "x": 300,
-      "y": 150,
-      "components": [
-        {
-          "type": "animation",
-          "file": "images/explosion.png",
-          "frame_width": 32,
-          "frame_height": 32,
-          "frames": [0, 1, 2, 3],
-          "speed": 10,
-          "loop": false,
-          "pivot_x": "center",
-          "pivot_y": "center"
-        },
-        {
-          "type": "custom",
-          "file": "ExplosionScript.py",
-          "args": [1.5]
-        }
-      ]
-    }
-  ]
-}
-```
-
-### Object Template (.obj)
-
-JSON formatında tekrar kullanılabilir objeler.
-
-```json
-{
-  "components": [
-    {
-      "type": "image",
-      "file": "images/box.png",
-      "pivot_x": "center",
-      "pivot_y": "end"
-    }
-  ]
-}
-```
-
-Kullanım:
-```python
-obj = Object.from_file("box.obj", x, y)
-```
-
-## Asset Formatları
-
-### Resimler
-- PNG, JPG desteklenir
-- Alpha channel (PNG) önerilir
-- Pixe-based koordinatlar
-
-### Animasyonlar
-1. **Sprite Sheet**: Tek resim, grid layout
-2. **Frame Listesi**: Birden fazla resim dosyası
-
 ## Script Yazma
 
 ### Script Template
 
 ```python
 import pygame
-from gaminal import *
+from pygaminal import *
 
 class MyScript:
     def __init__(self, arg1, arg2=None):
-        # Constructor, JSON args'dan değer alır
+        // Constructor, JSON args'dan değer alır
         self.value = arg1
 
-    def update(self, object):
-        # Her frame çağrılır
+    def update(self, obj):
+        // Her frame çağrılır
         app = App()
         im = InputManager()
 
-        # Input
+        // Input
         if im.is_pressed(pygame.K_SPACE):
-            # Aksiyon
+            // Aksiyon
             pass
 
-        # Hareket
-        object.x += 100 * app.dt
+        // Hareket
+        obj.x += 100 * app.dt
 
-        # Obje yaratma
+        // Obje yaratma
         new_obj = Object(100, 100)
         scene = app.get_current_scene()
         scene.add_object(new_obj)
 
-        # Obje yok etme
-        if object.x > 800:
-            object.kill()
+        // Obje yok etme
+        if obj.x > 800:
+            obj.kill()
 
-    def draw(self, object):
-        # Opsiyonel: Custom drawing
+    def draw(self, obj):
+        // Opsiyonel: Custom drawing
         pass
 ```
 
@@ -367,7 +447,7 @@ PYTHONPATH=/home/imns/Desktop/pygamer python main.py
 
 Veya:
 ```python
-from gaminal import *
+from pygaminal import *
 run_app("scene_data.json")
 ```
 
@@ -387,14 +467,12 @@ run_app("scene_data.json")
       "y": 300,
       "components": [
         {
-          "type": "image",
-          "file": "player.png",
-          "pivot_x": "center",
-          "pivot_y": "center"
+          "file": "@ImageComponent",
+          "args": ["player.png", "center", "end"]
         },
         {
-          "type": "custom",
-          "file": "PlayerController.py"
+          "file": "PlayerController",
+          "args": []
         }
       ]
     }
@@ -407,7 +485,7 @@ run_app("scene_data.json")
 `PlayerController.py`:
 ```python
 import pygame
-from gaminal import *
+from pygaminal import *
 
 class PlayerController:
     def update(self, obj):
@@ -438,12 +516,12 @@ PYTHONPATH=/path/to/pygamer python main.py
 ## Pygame Key Constants
 
 ```python
-pygame.K_a, pygame.K_b, ...  # Harfler
-pygame.K_0, pygame.K_1, ...  # Rakamlar
-pygame.K_SPACE               # Space
-pygame.K_ESCAPE              # Escape
-pygame.K_RETURN              # Enter
-pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN  # Yön tuşları
+pygame.K_a, pygame.K_b, ...  // Harfler
+pygame.K_0, pygame.K_1, ...  // Rakamlar
+pygame.K_SPACE               // Space
+pygame.K_ESCAPE              // Escape
+pygame.K_RETURN              // Enter
+pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN  // Yön tuşları
 ```
 
 ## Tips
@@ -453,73 +531,91 @@ pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN  # Yön tuşları
 3. **Depth Sorting**: YSortComponent ekle, objeler otomatik sıralanır
 4. **Animasyon**: Sprite sheet kullan, performans için
 5. **Cleanup**: Biten objeleri `object.kill()` ile yok et
-6. **Cooldows**: `app.now` kullanarak rate limiting yap
+6. **Cooldowns**: `app.now` kullanarak rate limiting yap
+7. **Multiple Components**: Aynı objeye birden fazla ImageComponent ekleyebilirsin (shadow, body, glow)
+8. **Component Naming**: Önemli component'lere explicit name ver, diğerlerini auto-name bırak
 
-## Component API
+## Component Best Practices
 
-### Tüm Component'ler
-```python
-component.update(object)  # Her frame
-component.draw(object)   # Çizim anı
+### Built-in Kullan
+Mümkünse built-in component'leri kullan:
+
+```json
+{"file": "@ImageComponent", "args": ["player.png", "center", "end"]}
 ```
 
-### Custom Component
+### Custom Script Yaz
+Özel logic için script yaz:
+
 ```python
-# JSON
-{
-  "type": "custom",
-  "file": "Script.py",
-  "args": [arg1, arg2]  # Constructor'a geçilir
-}
+// EnemyAI.py
+class EnemyAI:
+    def __init__(self, patrol_range=100):
+        self.patrol_range = patrol_range
+        self.start_x = 0
+
+    def update(self, obj):
+        app = App()
+        // Patrol logic
+        if obj.x > self.start_x + self.patrol_range:
+            obj.x -= 100 * app.dt
+        elif obj.x < self.start_x:
+            obj.x += 100 * app.dt
 ```
 
-Script'te:
-```python
-class Script:
-    def __init__(self, arg1, arg2):
-        # args: Constructor parametresi
-        pass
-    def update(self, object):
-        pass
-    def draw(self, object):
-        pass
+```json
+{"file": "EnemyAI", "args": [150]}
 ```
+
+### Component Reuse
+İyi yazılmış bir script'i built-in yap:
+1. Script'i `pygaminal/components/` dizinine kopyala
+2. JSON'da `@` prefix ile kullan
 
 ## Sahne Yönetimi
 
 ```python
-# Sahne değiştirme
+// Sahne değiştirme
 app.set_scene("level2")
 
-# Sahne'den obje silme
+// Sahne'den obje silme
 object.kill()
 
-# Scene objelerine erişim
-scene.objects
+// Scene objelerine erişim
+scene = app.get_current_scene()
+for obj in scene.objects:
+    // Objeleri gez
+    pass
 ```
 
 ## Gelişmiş Özellikler
 
 ### Custom Rendering (Script)
 ```python
-def draw(self, object):
+def draw(self, obj):
     screen = Screen()
-    # Custom drawing logic
+    // Custom drawing logic
+    screen.draw_circle(obj.x, obj.y, 10, (255, 0, 0))
 ```
 
-### Multiple Animations
+### Multiple Components
 ```python
-# İki animasyon component'i aynı objede
-obj.add_component("walk", walk_anim_component)
-obj.add_component("idle", idle_anim_component)
+// Birden fazla ImageComponent
+obj.get_components("@ImageComponent")  // [shadow, body, glow]
+
+// Birden fazla aynı script
+obj.get_components("AttackScript")  // [melee, ranged]
 ```
 
 ### Object Communication
 ```python
-# Script'ten diğer objeye erişim
+// Script'ten diğer objeye erişim
 scene = app.get_current_scene()
 for other_obj in scene.objects:
-    if other_obj != object:
-        # İletişim
-        pass
+    if other_obj != obj:
+        // İletişim
+        distance = ((obj.x - other_obj.x)**2 + (obj.y - other_obj.y)**2)**0.5
+        if distance < 50:
+            // Çarpışma vb.
+            pass
 ```
