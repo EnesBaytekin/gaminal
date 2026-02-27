@@ -1,103 +1,282 @@
 {
   "width": 800,
   "height": 600,
-  "background_color": "#222222",
+  "background_color": "#2a2a3a",
   "objects": [
     {
       "x": 400,
       "y": 300,
       "name": "player",
-      "tags": ["hero", "controllable"],
+      "tags": ["hero", "controllable", "collidable"],
       "components": [
         {
-          "file": "@ImageComponent",
-          "args": ["images/player.png", "center", "end"]
+          "file": "@Hitbox",
+          "args": [[-16, -16, 32, 32]]
         },
         {
-          "file": "MovementScript",
+          "file": "@Movability",
+          "args": [200, ["collidable", "wall"]]
+        },
+        {
+          "file": "@Image",
+          "args": ["images/player.png", "center", "center"]
+        },
+        {
+          "file": "@YSort",
           "args": []
         },
         {
-          "file": "@YSortComponent",
-          "args": []
-        }
-      ]
-    },
-    {
-      "x": 200,
-      "y": 400,
-      "name": "npc1",
-      "tags": ["npc"],
-      "components": [
-        {
-          "file": "@ImageComponent",
-          "args": ["images/player.png", "center", "end"]
-        },
-        {
-          "file": "@YSortComponent",
-          "args": []
-        }
-      ]
-    },
-    {
-      "x": 100,
-      "y": 350,
-      "name": "box1",
-      "tags": ["obstacle", "destructible"],
-      "components": [
-        {
-          "file": "@ImageComponent",
-          "args": ["images/box.png", "center", "end"]
-        },
-        {
-          "file": "@YSortComponent",
-          "args": []
+          "file": "PlayerMovementScript",
+          "args": [200]
         }
       ]
     },
     {
       "x": 600,
       "y": 300,
-      "name": "tree1",
-      "tags": ["decoration"],
+      "name": "player2",
+      "tags": ["hero2"],
       "components": [
         {
-          "file": "@ImageComponent",
-          "args": ["images/tree.png", "center", "end"]
+          "file": "@Hitbox",
+          "args": [[-16, -16, 32, 32]]
         },
         {
-          "file": "@YSortComponent",
+          "file": "@Movability",
+          "args": [150, ["collidable", "wall"]]
+        },
+        {
+          "file": "@Image",
+          "args": ["images/player.png", "center", "center"]
+        },
+        {
+          "file": "@YSort",
           "args": []
+        },
+        {
+          "file": "ArrowKeyMovementScript",
+          "args": [150]
         }
       ]
     },
     {
-      "x": 500,
-      "y": 450,
-      "name": "tower1",
-      "tags": ["building"],
+      "x": 200,
+      "y": 400,
+      "name": "box1",
+      "tags": ["collidable"],
       "components": [
         {
-          "file": "@ImageComponent",
-          "args": ["images/tower.png", "center", "end"]
+          "file": "@Hitbox",
+          "args": [[-16, -16, 32, 32]]
         },
         {
-          "file": "@YSortComponent",
+          "file": "@Image",
+          "args": ["images/box.png", "center", "center"]
+        },
+        {
+          "file": "@YSort",
           "args": []
         }
       ]
     },
     {
       "x": 300,
+      "y": 400,
+      "name": "box2",
+      "tags": ["collidable"],
+      "components": [
+        {
+          "file": "@Hitbox",
+          "args": [[-16, -16, 32, 32]]
+        },
+        {
+          "file": "@Image",
+          "args": ["images/box.png", "center", "center"]
+        },
+        {
+          "file": "@YSort",
+          "args": []
+        }
+      ]
+    },
+    {
+      "x": 100,
       "y": 200,
+      "name": "wall_left",
+      "tags": ["wall", "collidable"],
+      "components": [
+        {
+          "file": "@Hitbox",
+          "args": [[0, 0, 32, 100]]
+        },
+        {
+          "file": "@Image",
+          "args": ["images/box.png", "center", "center"]
+        },
+        {
+          "file": "@YSort",
+          "args": []
+        }
+      ]
+    },
+    {
+      "x": 700,
+      "y": 200,
+      "name": "wall_right",
+      "tags": ["wall", "collidable"],
+      "components": [
+        {
+          "file": "@Hitbox",
+          "args": [[0, 0, 32, 100]]
+        },
+        {
+          "file": "@Image",
+          "args": ["images/box.png", "center", "center"]
+        },
+        {
+          "file": "@YSort",
+          "args": []
+        }
+      ]
+    },
+    {
+      "x": 400,
+      "y": 100,
+      "name": "wall_top",
+      "tags": ["wall", "collidable"],
+      "components": [
+        {
+          "file": "@Hitbox",
+          "args": [[0, 0, 100, 32]]
+        },
+        {
+          "file": "@Image",
+          "args": ["images/box.png", "center", "center"]
+        },
+        {
+          "file": "@YSort",
+          "args": []
+        }
+      ]
+    },
+    {
+      "x": 500,
+      "y": 500,
+      "name": "moving_obstacle",
+      "tags": ["collidable", "obstacle"],
+      "components": [
+        {
+          "file": "@Hitbox",
+          "args": [[-16, -16, 32, 32]]
+        },
+        {
+          "file": "@Movability",
+          "args": [60, ["collidable"]]
+        },
+        {
+          "file": "@Image",
+          "args": ["images/box.png", "center", "center"]
+        },
+        {
+          "file": "@YSort",
+          "args": []
+        },
+        {
+          "file": "BouncingScript",
+          "args": [60, 80]
+        }
+      ]
+    },
+    {
+      "x": 150,
+      "y": 150,
+      "name": "tree1",
+      "tags": ["decoration"],
+      "components": [
+        {
+          "file": "@Image",
+          "args": ["images/tree.png", "center", "end"]
+        },
+        {
+          "file": "@YSort",
+          "args": []
+        }
+      ]
+    },
+    {
+      "x": 650,
+      "y": 150,
+      "name": "tree2",
+      "tags": ["decoration"],
+      "components": [
+        {
+          "file": "@Image",
+          "args": ["images/tree.png", "center", "end"]
+        },
+        {
+          "file": "@YSort",
+          "args": []
+        }
+      ]
+    },
+    {
+      "x": 550,
+      "y": 450,
+      "name": "tower1",
+      "tags": ["building"],
+      "components": [
+        {
+          "file": "@Image",
+          "args": ["images/tower.png", "center", "end"]
+        },
+        {
+          "file": "@YSort",
+          "args": []
+        }
+      ]
+    },
+    {
+      "x": 250,
+      "y": 250,
+      "name": "tower2",
+      "tags": ["building"],
+      "components": [
+        {
+          "file": "@Image",
+          "args": ["images/tower.png", "center", "end"]
+        },
+        {
+          "file": "@YSort",
+          "args": []
+        }
+      ]
+    },
+    {
+      "x": 300,
+      "y": 300,
       "tags": ["effect"],
       "components": [
         {
-          "file": "@AnimationComponent",
+          "file": "@Animation",
           "args": [{"file": "images/fx.png", "frame_width": 32, "frame_height": 32, "frames": [0, 1, 2, 3], "speed": 5, "loop": true}]
         },
         {
-          "file": "@YSortComponent",
+          "file": "@YSort",
+          "args": []
+        }
+      ]
+    },
+    {
+      "x": 500,
+      "y": 350,
+      "tags": ["effect"],
+      "components": [
+        {
+          "file": "@Animation",
+          "args": [{"file": "images/fx.png", "frame_width": 32, "frame_height": 32, "frames": [0, 1, 2, 3], "speed": 8, "loop": true}]
+        },
+        {
+          "file": "@YSort",
           "args": []
         }
       ]

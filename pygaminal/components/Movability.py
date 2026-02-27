@@ -27,6 +27,20 @@ class Movability:
         Returns:
             bool: True if movement successful, False if blocked
         """
+        # Split large movements into smaller steps for better collision
+        max_step = 10  # Maximum movement per step
+        steps = max(1, int(abs(dx) / max_step))
+        step_distance = dx / steps
+
+        for i in range(steps):
+            if not self._move_x_step(obj, step_distance):
+                # This step was blocked, stop further movement
+                return False
+
+        return True
+
+    def _move_x_step(self, obj, dx):
+        """Single step of X movement with collision detection."""
         # Store old position
         old_x = obj.x
 
@@ -61,6 +75,20 @@ class Movability:
         Returns:
             bool: True if movement successful, False if blocked
         """
+        # Split large movements into smaller steps for better collision
+        max_step = 10  # Maximum movement per step
+        steps = max(1, int(abs(dy) / max_step))
+        step_distance = dy / steps
+
+        for i in range(steps):
+            if not self._move_y_step(obj, step_distance):
+                # This step was blocked, stop further movement
+                return False
+
+        return True
+
+    def _move_y_step(self, obj, dy):
+        """Single step of Y movement with collision detection."""
         # Store old position
         old_y = obj.y
 

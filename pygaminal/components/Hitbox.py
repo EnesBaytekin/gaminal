@@ -45,7 +45,7 @@ class Hitbox:
         Initialize with hitboxes.
 
         Args:
-            hitboxes: Single Rect or list of Rects, or tuple (offset_x, offset_y, width, height)
+            hitboxes: Single Rect or list of Rects, or tuple/list (offset_x, offset_y, width, height)
         """
         self.hitboxes = []
 
@@ -54,8 +54,13 @@ class Hitbox:
 
         if isinstance(hitboxes, Rect):
             self.hitboxes = [hitboxes]
-        elif isinstance(hitboxes, list):
-            self.hitboxes = hitboxes
+        elif isinstance(hitboxes, list) and len(hitboxes) > 0:
+            # Check if it's a list of 4 numbers (single hitbox data)
+            if len(hitboxes) == 4 and all(isinstance(x, (int, float)) for x in hitboxes):
+                self.hitboxes = [Rect(*hitboxes)]
+            else:
+                # Assume it's a list of Rects or hitbox data
+                self.hitboxes = hitboxes
         elif isinstance(hitboxes, dict):
             # Create from dict (JSON support)
             self.hitboxes = [Rect(
