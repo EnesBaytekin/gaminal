@@ -1,4 +1,4 @@
-class YSortComponent:
+class YSort:
     """Component that sets object depth based on Y position for depth sorting."""
 
     def __init__(self):

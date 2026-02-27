@@ -1,11 +1,11 @@
-from pygaminal.image import Image
+from pygaminal.image import Image as ImageClass
 from pygaminal.screen import Screen
 
 
-class ImageComponent:
+class Image:
     def __init__(self, image_or_path, pivot_x=0, pivot_y=0):
         """
-        Initialize ImageComponent.
+        Initialize Image component.
 
         Args:
             image_or_path: Image object or file path string
@@ -13,7 +13,7 @@ class ImageComponent:
             pivot_y: Pivot Y (0, "center", "end", or pixel value)
         """
         if isinstance(image_or_path, str):
-            self.image = Image.from_file(image_or_path)
+            self.image = ImageClass.from_file(image_or_path)
         else:
             self.image = image_or_path
 

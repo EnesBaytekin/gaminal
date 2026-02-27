@@ -1,11 +1,11 @@
-from pygaminal.animation import Animation
+from pygaminal.animation import Animation as AnimationClass
 from pygaminal.screen import Screen
 
 
-class AnimationComponent:
+class Animation:
     def __init__(self, animation_or_data, pivot_x=0, pivot_y=0):
         """
-        Initialize AnimationComponent.
+        Initialize Animation component.
 
         Args:
             animation_or_data: Animation object or dict with sprite sheet data
@@ -14,12 +14,12 @@ class AnimationComponent:
             pivot_x: Pivot X (0, "center", "end", or pixel value)
             pivot_y: Pivot Y (0, "center", "end", or pixel value)
         """
-        if isinstance(animation_or_data, Animation):
+        if isinstance(animation_or_data, AnimationClass):
             self.animation = animation_or_data
         elif isinstance(animation_or_data, dict):
             # Load from sprite sheet data
             data = animation_or_data
-            self.animation = Animation.from_sprite_sheet(
+            self.animation = AnimationClass.from_sprite_sheet(
                 data["file"],
                 data["frame_width"],
                 data["frame_height"],
