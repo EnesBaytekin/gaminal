@@ -20,10 +20,6 @@ class BouncingScript:
         # Get Movability component
         movability = obj.get_component("Movability")
 
-        # Get actual Movability instance (from ScriptComponent wrapper if needed)
-        if movability and hasattr(movability, 'instance'):
-            movability = movability.instance
-
         # Calculate movement
         dx = self.direction * self.speed * app.dt
 
@@ -42,3 +38,7 @@ class BouncingScript:
             self.direction = -1
         elif obj.x < self.start_x - self.range_x:
             self.direction = 1
+
+    def draw(self, obj):
+        """BouncingScript doesn't need drawing."""
+        pass

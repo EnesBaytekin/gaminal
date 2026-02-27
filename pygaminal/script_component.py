@@ -39,10 +39,21 @@ class ScriptComponent(Component):
         component_class = getattr(self.script, class_name)
         self.instance = component_class(*args)
 
+    def __getattr__(self, name):
+        """Delegate attribute access to instance for convenience."""
+        if name in ['instance', 'file_name', 'script']:
+            # Don't delegate these internal attributes
+            raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
+        return getattr(self.instance, name)
+
     def draw(self, object):
         """Delegate draw to component instance if method exists."""
-        if hasattr(self.instance, 'draw'):
-            self.instance.draw(object)
+        try:
+            if hasattr(self.instance, 'draw'):
+                self.instance.draw(object)
+        except AttributeError as e:
+            # Component doesn't have draw method, ignore
+            pass
 
     def update(self, object):
         """Delegate update to component instance if method exists."""

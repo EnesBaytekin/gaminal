@@ -54,7 +54,7 @@
           "args": []
         },
         {
-          "file": "ArrowKeyMovementScript",
+          "file": "MouseFollowerScript",
           "args": [150]
         }
       ]

@@ -19,7 +19,6 @@ class PlayerMovementScript:
         # Get Movability component
         movability = obj.get_component("Movability")
         if movability:
-            movability = movability.instance
             # Use Movability component for collision-aware movement
             move_distance = self.speed * app.dt
 
@@ -36,6 +35,10 @@ class PlayerMovementScript:
         # Keep player in bounds
         obj.x = max(0, min(800, obj.x))
         obj.y = max(0, min(600, obj.y))
+
+    def draw(self, obj):
+        """PlayerMovementScript doesn't need drawing."""
+        pass
 
 
 class WASDMovementScript:
@@ -58,6 +61,10 @@ class WASDMovementScript:
         obj.x = max(0, min(800, obj.x))
         obj.y = max(0, min(600, obj.y))
 
+    def draw(self, obj):
+        """WASDMovementScript doesn't need drawing."""
+        pass
+
 
 class ArrowKeyMovementScript:
     """Arrow key movement with collision."""
@@ -74,7 +81,6 @@ class ArrowKeyMovementScript:
 
         movability = obj.get_component("Movability")
         if movability:
-            movability = movability.instance
             move_distance = self.speed * app.dt
 
             if dx != 0:
@@ -88,3 +94,7 @@ class ArrowKeyMovementScript:
         # Keep in bounds
         obj.x = max(0, min(800, obj.x))
         obj.y = max(0, min(600, obj.y))
+
+    def draw(self, obj):
+        """ArrowKeyMovementScript doesn't need drawing."""
+        pass
