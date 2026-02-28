@@ -56,6 +56,10 @@
         {
           "file": "MouseFollowerScript",
           "args": [150]
+        },
+        {
+          "file": "GamepadMovementScript",
+          "args": []
         }
       ]
     },
