@@ -22,7 +22,7 @@ class Screen:
     def init(self, width, height):
         self.width = width
         self.height = height
-        self.surface = pygame.display.set_mode((width, height))
+        self.surface = pygame.display.set_mode((width, height), pygame.SCALED)
 
     def set_background_color(self, color):
         if isinstance(color, str):
