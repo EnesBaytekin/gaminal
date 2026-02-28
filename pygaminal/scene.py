@@ -33,9 +33,9 @@ class Scene:
         return list(self.objects.values())
 
     def draw(self):
-        """Draw all objects sorted by depth."""
+        """Draw all objects sorted by depth (lower depth = drawn first)."""
         objects = list(self.objects.values())
-        for obj in sorted(objects, key=lambda o: o.y):  # Y-sort
+        for obj in sorted(objects, key=lambda o: o.depth):  # Sort by depth
             obj.draw()
 
     def update(self):

@@ -5,11 +5,12 @@ from json import load
 class Object:
     _id_counter = 0
 
-    def __init__(self, x, y, name=None, tags=None):
+    def __init__(self, x, y, name=None, tags=None, depth=0):
         self.x = x
         self.y = y
         self.name = self._generate_name(name)
         self.tags = set(tags or [])
+        self.depth = depth
         self.components = {}  # {name: ScriptComponent}
         self.dead = False
 
@@ -62,8 +63,9 @@ class Object:
     def from_data(cls, object_data, x, y):
         name = object_data.get("name")
         tags = object_data.get("tags")
+        depth = object_data.get("depth", 0)  # Default depth is 0
 
-        object = cls(x, y, name=name, tags=tags)
+        object = cls(x, y, name=name, tags=tags, depth=depth)
 
         for component_data in object_data["components"]:
             file_name = component_data["file"]
