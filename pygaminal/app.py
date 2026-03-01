@@ -1,6 +1,7 @@
 import pygame
 from pygaminal.screen import Screen
 from pygaminal.input_manager import InputManager
+from pygaminal.audio_manager import AudioManager
 from time import time
 
 
@@ -19,6 +20,7 @@ class App:
         Screen().init(width, height)
         pygame.display.set_caption(title)
         InputManager().init()
+        AudioManager().init()
         self.running = False
         self.scenes = {}
         self.current_scene_name = None
@@ -36,6 +38,7 @@ class App:
             self.current_scene_name = name
 
     def set_scene(self, name):
+        """Change to a different scene."""
         self.current_scene_name = name
 
     def get_current_scene(self):

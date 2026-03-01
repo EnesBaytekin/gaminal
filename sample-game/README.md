@@ -99,3 +99,106 @@ Objelerin hareketi ve çarpışma kontrolü:
 2. **Kutu Testi**: Kutulara çarp
    - Kutular sabit kalır
    - Üzerlerinden geçilemez
+
+## Ses ve Müzik Sistemi
+
+Tüm sesler ve müzikler **objeler üzerinden** yönetilir. Scene'de doğrudan müzik ayarı yok.
+
+### BackgroundMusic Component
+
+Arka plan müziği çalmak için objeye eklenir:
+
+```json
+{
+  "x": 0,
+  "y": 0,
+  "name": "bg_music_player",
+  "tags": [],
+  "components": [
+    {
+      "file": "@BackgroundMusic",
+      "args": ["sounds/music.ogg", true, 1.0, 0.6]
+    }
+  ]
+}
+```
+
+**Parametreler:**
+- `music_file`: Müzik dosyası (mp3, ogg, vb.)
+- `loop`: Döngü çalsın mı? (true/false)
+- `fade_in`: Fade-in süresi (saniye)
+- `volume`: Ses seviyesi (0.0 - 1.0)
+
+**Kod ile kullanım:**
+```python
+# Component'ten al
+bg_music = obj.get_component("BackgroundMusic")
+
+# Kontrol
+bg_music.play()
+bg_music.stop(fade_out=2.0)
+bg_music.pause()
+bg_music.resume()
+bg_music.set_volume(0.5)
+```
+
+### SoundEffect Component
+
+Objelere ses efekti eklemek için:
+
+```json
+{
+  "file": "@SoundEffect",
+  "args": ["footstep.wav", 1.0, false, false]
+}
+```
+
+**Parametreler:**
+- `sound_path`: Ses dosyası (wav, ogg)
+- `volume`: Ses seviyesi (0.0 - 1.0)
+- `auto_play`: Obje oluşturulunca otomatik çal
+- `loop`: Döngü çal
+
+**Kod ile kullanım:**
+```python
+# Component'ten ses al
+sound = obj.get_component("SoundEffect")
+
+# Çal
+sound.play(volume=0.8)
+
+# Durdur
+sound.stop()
+sound.pause()
+sound.resume()
+
+# Ses seviyesi
+sound.set_volume(0.5)
+```
+
+### Örnek Kullanım
+
+**Arka plan müziği için obje:**
+```json
+{
+  "x": 0,
+  "y": 0,
+  "name": "music_player",
+  "components": [
+    {
+      "file": "@BackgroundMusic",
+      "args": ["music/dungeon.mp3", true, 3.0, 0.6]
+    }
+  ]
+}
+```
+
+**Objede ses efekti:**
+```python
+# PlayerMovementScript'te
+if dx != 0 and not sound.is_playing():
+    sound.play()  # Yürürken adım sesi
+
+if input_manager.is_just_pressed(pygame.K_SPACE):
+    jump_sound.play()  # Zıplama sesi
+```

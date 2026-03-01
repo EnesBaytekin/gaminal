@@ -4,6 +4,18 @@
   "background_color": "#2a2a3a",
   "objects": [
     {
+      "x": 0,
+      "y": 0,
+      "name": "bg_music_player",
+      "tags": [],
+      "components": [
+        {
+          "file": "@BackgroundMusic",
+          "args": ["sounds/music.ogg", true, 1.0, 0.6]
+        }
+      ]
+    },
+    {
       "x": 400,
       "y": 300,
       "name": "player",
@@ -28,6 +40,10 @@
         {
           "file": "PlayerMovementScript",
           "args": [200]
+        },
+        {
+          "file": "MusicControlScript",
+          "args": []
         }
       ]
     },

@@ -8,6 +8,7 @@ from .scene import Scene
 from .screen import Screen
 from .util import *
 from .input_manager import InputManager
+from .audio_manager import AudioManager
 
 change_dir_to_main_dir()
 
