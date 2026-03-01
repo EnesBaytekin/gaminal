@@ -14,19 +14,23 @@ pygamer/
 │   ├── component.py              # Base Component
 │   ├── script_component.py       # Universal component loader
 │   ├── components/               # Built-in component script'leri
-│   │   ├── ImageComponent.py    # Sprite çizim
-│   │   ├── AnimationComponent.py # Animasyon çizim
-│   │   └── YSortComponent.py    # Y eksenine göre depth sorting
-│   ├── image.py                  # PNG/JPG yükleme
-│   ├── animation.py              # Animasyon sistemi
+│   │   ├── Image.py              # Sprite çizim
+│   │   ├── Animation.py          # Animasyon çizim
+│   │   ├── YSort.py              # Y eksenine göre depth sorting
+│   │   ├── Hitbox.py             # Çarpışma kutuları
+│   │   ├── Movability.py         # Hareket + collision
+│   │   ├── BackgroundMusic.py    # Arka plan müziği
+│   │   └── SoundEffect.py        # Ses efektleri
 │   ├── screen.py                 # Singleton: Pygame Surface yönetimi
-│   ├── input_manager.py          # Singleton: Input handling
+│   ├── input_manager.py          # Singleton: Input handling (keyboard, mouse, joystick)
+│   ├── audio_manager.py          # Singleton: Audio yönetimi
 │   └── util.py                   # Yardımcı fonksiyonlar
 └── sample-game/                  # Örnek oyun
     ├── scene_data.json           # Sahne tanımı
     ├── main.py                   # Entry point
-    ├── MovementScript.py         # Custom script
-    └── images/                   # Assetler (PNG)
+    ├── PlayerMovementScript.py   # Custom script
+    ├── images/                   # Assetler (PNG)
+    └── sounds/                   # Audio dosyaları
 ```
 
 ## Core Sınıflar
@@ -68,19 +72,72 @@ screen.refresh()  # Display güncelle
 ```
 
 ### InputManager (Singleton)
-Input yönetimi.
+Input yönetimi - Keyboard, Mouse, Joystick desteği.
 
 ```python
 from pygaminal import InputManager
 import pygame
 
 im = InputManager()
-im.update()  # Frame başı çağır
+im.update()  # Frame başı çağrılır (otomatik)
 
-# Key kontrolü
+# Klavye
 if im.is_pressed(pygame.K_w):  # Basılı mı
 if im.is_just_pressed(pygame.K_SPACE):  # Just basıldı mı
 if im.is_released(pygame.K_a):  # Bırakıldı mı
+
+# Mouse
+mx, my = im.get_mouse_position()
+if im.is_mouse_pressed(1):  # Sol tık basılı
+if im.is_mouse_just_pressed(3):  # Sağ tık just basıldı
+
+# Joystick/Gamepad
+if im.is_joystick_connected(0):
+    axis_x = im.get_axis(0, 0)  # Sol stick X
+    axis_y = im.get_axis(1, 0)  # Sol stick Y
+    if im.get_button_pressed(0, 0):  # A button
+        print("A pressed")
+```
+
+**Joystick Metotları:**
+- `get_joystick_count()` - Bağlı joystick sayısı
+- `is_joystick_connected(joystick_id)` - Bağlı mı?
+- `get_joystick_name(joystick_id)` - Joystick adı
+- `get_axis(axis_index, joystick_id)` - Axis değeri (-1.0 ile 1.0)
+- `get_button_pressed(button_index, joystick_id)` - Buton basılı mı?
+- `get_button_just_pressed(button_index, joystick_id)` - Buton just basıldı mı?
+- `get_hat(hat_index, joystick_id)` - D-pad değeri
+
+**Axis Index'leri (Xbox controller):**
+- 0: Sol stick X
+- 1: Sol stick Y
+- 2: Sağ stick X
+- 3: Sağ stick Y
+
+**Button Index'leri (Xbox controller):**
+- 0: A, 1: B, 2: X, 3: Y
+- 4: Left Bumper, 5: Right Bumper
+- 6: Back, 7: Start
+- 8: Left Stick, 9: Right Stick
+
+### AudioManager (Singleton)
+Ses ve müzik yönetimi.
+
+```python
+from pygaminal import AudioManager
+
+audio = AudioManager()
+
+# Müzik kontrolü
+audio.play_music("bgm.mp3", loop=True, fade_in=2.0, volume=0.7)
+audio.stop_music(fade_out=1.0)
+audio.pause_music()
+audio.resume_music()
+audio.is_music_playing()
+
+# Ses seviyesi
+audio.set_music_volume(0.5)
+audio.set_sfx_volume(0.8)
 ```
 
 ### Scene
@@ -92,7 +149,7 @@ from pygaminal import Scene
 scene = Scene()
 scene.add_object(obj)  # Obje ekle (next frame'de aktif)
 scene.update()  # Tüm objeleri update et
-scene.draw()  # Tüm objeleri çiz
+scene.draw()  # Tüm objeleri depth'e göre çiz
 ```
 
 **Storage:**
@@ -117,7 +174,7 @@ Entity-Component mimarisi. **Her obje unique isme sahiptir.**
 ```python
 from pygaminal import Object
 
-obj = Object(x, y, name="player", tags=["hero", "main"])
+obj = Object(x, y, name="player", tags=["hero", "main"], depth=0)
 obj.kill()  # Objeyi yok et (next frame'de silinir)
 ```
 
@@ -125,19 +182,47 @@ obj.kill()  # Objeyi yok et (next frame'de silinir)
 - `name` - Unique isim (auto-generated veya explicit)
 - `tags` - Tag set'i (set of strings)
 - `x`, `y` - Pozisyon
+- `depth` - Çizim derinliği (düşük = arkada, yüksek = önde)
 - `dead` - Öldü mü?
-- `depth` - Çizim derinliği (otomatik Y-sort)
 
 **Metodlar:**
-- `add_tag(tag)` - Tag ekle (obj.tags'de hemen, scene._tags'de next frame)
-- `remove_tag(tag)` - Tag sil (obj.tags'te hemen, scene._tags'den next frame)
-- `has_tag(tag)` - Tag kontrolü ✅ - Works immediately
+- `add_tag(tag)` - Tag ekle
+- `remove_tag(tag)` - Tag sil
+- `has_tag(tag)` - Tag kontrolü
 - `kill()` - Next frame'de sil
 - `add_component(component, explicit_name=None)` - Component ekle
-- `get_component(name)` - Component al (unique name ile)
+- `get_component(name)` - Component al
 - `get_components(file_name)` - Aynı türdeki tüm component'leri al
 
 ## Objeleri Yönetme
+
+### Depth Sistemi
+Objeler `depth` değerine göre çizilir:
+
+```python
+# Zemin (arkada)
+floor = Object(100, 100, depth=-10)
+
+// Duvarlar
+wall = Object(100, 100, depth=0)
+
+// Karakterler (önde)
+player = Object(100, 100, depth=10)
+
+// UI (en üstte)
+ui = Object(100, 100, depth=100)
+```
+
+JSON'da:
+```json
+{
+  "x": 100,
+  "y": 100,
+  "depth": 10,
+  "name": "player",
+  ...
+}
+```
 
 ### Name Sistemi
 Her objenin unique bir ismi vardır:
@@ -146,14 +231,14 @@ Her objenin unique bir ismi vardır:
 # Explicit name
 obj = Object(100, 100, name="player")
 
-# Auto-generated name (ad conflicts için)
-obj = Object(100, 100)  // name = "object_0"
-obj = Object(200, 200)  // name = "object_1"
+# Auto-generated name
+obj = Object(100, 100)  # name = "object_0"
+obj = Object(200, 200)  # name = "object_1"
 
 # Name conflicts → auto-numbering
 obj1 = Object(100, 100, name="box")
-obj2 = Object(200, 200, name="box")  // → "box_2"
-obj3 = Object(300, 300, name="box")  // → "box_3"
+obj2 = Object(200, 200, name="box")  # → "box_2"
+obj3 = Object(300, 300, name="box")  # → "box_3"
 ```
 
 ### Tag Sistemi
@@ -168,14 +253,14 @@ enemy = Object(200, 200, tags=["enemy", "flying"])
 enemy.add_tag("poisoned")
 enemy.remove_tag("flying")
 
-// Check tag (immediate - works same-frame)
+# Check tag (immediate - works same-frame)
 if enemy.has_tag("poisoned"):
     take_damage()
 ```
 
 ### Objeleri Erişme
 
-**ByName - Tek obje:**
+**By Name - Tek obje:**
 ```python
 player = scene.get_object("player")
 player.x += 100
@@ -210,104 +295,30 @@ def shoot(self, obj):
 def create_explosion(self, x, y):
     particle = Object(x, y, tags=["effect", "explosion"])
     scene.add_object(particle)
-    # Tag ile yönetilebilir, name gereksiz
-```
-
-### Pending Updates Sistemi
-
-Değişiklikler **frame sonunda** uygulanır:
-
-```python
-// Tag ekle
-obj.add_tag("flying")
-// - obj.tags'de: ✅ HEMEN var
-// - scene._tags'de: ❌ Next frame'de var
-
-// Objeye erişim (immediate)
-if obj.has_tag("flying"):  // ✅ Works same-frame
-    fly()
-
-// Scene-wide query (next frame)
-enemies = scene.get_objects_by_tag("enemy")
-// Eğer aynı frame'de tag eklendiyse, bu objenin listede OLMAMASI normal
-```
-
-**Neden?**
-- **Performans:** Frame ortasında index update yapmıyoruz
-- **Tutarlılık:** Tüm değişiklikler bir sonraki frame'den itibaren aktif
-- **O(1) Lookup:** Index her zaman güncel ve fast
-
-**Kullanım ipucu:** Genelde next frame'de query yaparsınız, sorun değil.
-
-### Obje Silme
-
-```python
-// Mark for removal
-obj.kill()
-
-// Veya
-scene.remove_object(obj)
-
-// Next frame'de silinir:
-// - scene.objects'dan
-// - scene._tags'den
-// - Cleanup tam
 ```
 
 ## Component Sistemi
 
-### Uniform Component Yapısı
-
-Tüm component'ler **aynı format**ta script dosyalarıdır. Built-in component'ler ve user script'ler arasında fark yoktur.
-
-#### Built-in Component'ler
-Framework ile birlikte gelen component'ler. `@` prefix'i ile kullanılır:
+### Component Naming Convention
+Component isimlerinde **"Component" suffix'i yoktur**:
 
 ```json
-{"file": "@ImageComponent", "args": [...]}
-{"file": "@AnimationComponent", "args": [...]}
-{"file": "@YSortComponent", "args": []}
-```
+{"file": "@Image", "args": [...]}        // ✅ Doğru
+{"file": "@Animation", "args": [...]}    // ✅ Doğru
+{"file": "@YSort", "args": []}           // ✅ Doğru
 
-#### User-Defined Component'ler
-Kullanıcının yazdığı script'ler. Dosya adı ile kullanılır:
-
-```json
-{"file": "MovementScript", "args": [200]}
-{"file": "MyScript", "args": []}
-```
-
-### Component Script Formatı
-
-Her component script'i aynı yapıdadır - **inheritance gerekmez**:
-
-```python
-# MyComponent.py
-class MyComponent:
-    def __init__(self, arg1, arg2=None):
-        # Constructor
-        self.value = arg1
-
-    def update(self, obj):
-        # Her frame çağrılır
-        obj.x += 100 * app.dt
-
-    def draw(self, obj):
-        # Çizim anında çağrılır (opsiyonel)
-        pass
+{"file": "@ImageComponent", ...}        // ❌ Yanlış (eski)
 ```
 
 ### Built-in Component'ler
 
-#### ImageComponent
-Tek frame çizim.
+#### Image
+Tek frame sprite çizim.
 
-```python
-# JSON
+```json
 {
-  "file": "@ImageComponent",
-  "name": "body",  // Optional
-  "args": ["player.png", "center", "end"]
+  "file": "@Image",
+  "args": ["player.png", "center", "center"]
 }
 ```
 
@@ -316,13 +327,12 @@ Tek frame çizim.
 2. `pivot_x` - "center", "end", veya pixel değeri
 3. `pivot_y` - "center", "end", veya pixel değeri
 
-#### AnimationComponent
+#### Animation
 Animasyon çizim.
 
-```python
-# JSON
+```json
 {
-  "file": "@AnimationComponent",
+  "file": "@Animation",
   "args": [{
     "file": "walk.png",
     "frame_width": 32,
@@ -343,54 +353,162 @@ Animasyon çizim.
   - `speed` - Animasyon hızı
   - `loop` - Döngü mü?
 
-#### YSortComponent
-Y pozisyonuna göre depth ayarlama (derinlik sıralaması için).
+#### YSort
+Otomatik depth sorting (y pozisyonuna göre).
 
-```python
+```json
 {
-  "file": "@YSortComponent",
+  "file": "@YSort",
   "args": []
 }
 ```
 
-### Component Yönetimi
+#### Hitbox
+Çarpışma kutuları tanımlama.
 
-**Tek Component (Name ile):**
-```python
-// JSON
+```json
 {
-  "file": "@ImageComponent",
-  "name": "shadow",
-  "args": ["shadow.png"]
+  "file": "@Hitbox",
+  "args": [[-16, -16, 32, 32]]
 }
-
-// Python
-comp = obj.get_component("shadow")
 ```
 
-**Aynı Türden Çoklu Component:**
+**Args:**
+- `hitboxes` - Tek hitbox: `[offset_x, offset_y, width, height]`
+             - Çoklu hitbox: `[[...], [...]]`
+             - Dict: `{"body": [...], "attack": [...]}`
+
+#### Movability
+Hareket + collision detection.
+
+```json
+{
+  "file": "@Movability",
+  "args": [200, ["collidable", "wall"]]
+}
+```
+
+**Args:**
+1. `speed` - Hareket hızı (pixels/second)
+2. `collidables` - Çarpışacağı tag listesi
+
+**Metodlar:**
+- `move_x(obj, dx)` - X ekseninde hareket (collision kontrolü ile)
+- `move_y(obj, dy)` - Y ekseninde hareket (collision kontrolü ile)
+
+#### BackgroundMusic
+Arka plan müziği çalma.
+
+```json
+{
+  "file": "@BackgroundMusic",
+  "args": ["music/bgm.mp3", true, 2.0, 0.6]
+}
+```
+
+**Args:**
+1. `music_file` - Müzik dosyası (mp3, ogg, vb.)
+2. `loop` - Döngü çalsın mı? (true/false)
+3. `fade_in` - Fade-in süresi (saniye)
+4. `volume` - Ses seviyesi (0.0 - 1.0)
+
+**Metodlar:**
+- `play()` - Çal
+- `stop(fade_out)` - Durdur
+- `pause()` - Pause
+- `resume()` - Resume
+- `set_volume(volume)` - Ses seviyesi
+
+#### SoundEffect
+Kısa ses efektleri çalma.
+
+```json
+{
+  "file": "@SoundEffect",
+  "args": ["footstep.wav", 1.0, false, false]
+}
+```
+
+**Args:**
+1. `sound_path` - Ses dosyası (wav, ogg)
+2. `volume` - Ses seviyesi (0.0 - 1.0)
+3. `auto_play` - Otomatik çal
+4. `loop` - Döngü çal
+
+**Metodlar:**
+- `play(volume)` - Çal
+- `stop()` - Durdur
+- `pause()` - Pause
+- `resume()` - Resume
+- `set_volume(volume)` - Ses seviyesi
+- `is_playing()` - Çalıyor mu?
+
+### User-Defined Component'ler
+Kullanıcının yazdığı script'ler. Dosya adı ile kullanılır:
+
+```json
+{"file": "PlayerMovementScript", "args": [200]}
+{"file": "EnemyAI", "args": []}
+```
+
+### Component Script Formatı
+
+Her component script'i aynı yapıdadır - **inheritance gerekmez**:
+
 ```python
-// JSON - Auto-naming
-{
-  "components": [
-    {"file": "@ImageComponent", "args": ["layer1.png"]},
-    {"file": "@ImageComponent", "args": ["layer2.png"]},
-    {"file": "@ImageComponent", "args": ["layer3.png"]}
-  ]
-}
-// Sonuç: ImageComponent, ImageComponent2, ImageComponent3
+# MyComponent.py
+class MyComponent:
+    def __init__(self, arg1, arg2=None):
+        # Constructor
+        self.value = arg1
 
-// JSON - Explicit naming
-{
-  "components": [
-    {"file": "@ImageComponent", "name": "shadow", "args": ["shadow.png"]},
-    {"file": "@ImageComponent", "name": "body", "args": ["body.png"]},
-    {"file": "@ImageComponent", "name": "glow", "args": ["glow.png"]}
-  ]
-}
+    def update(self, obj):
+        # Her frame çağrılır
+        app = App()
+        obj.x += 100 * app.dt
 
-// Python - Tüm aynı türdekileri al
-images = obj.get_components("@ImageComponent")  // [comp1, comp2, comp3]
+    def draw(self, obj):
+        # Opsiyonel: Custom drawing
+        pass
+```
+
+## Collision Sistemi
+
+### Hitbox Kullanımı
+
+```json
+{
+  "file": "@Hitbox",
+  "args": [[-16, -16, 32, 32]]
+}
+```
+
+### Movability ile Collision-Aware Hareket
+
+```python
+# Script'te
+movability = obj.get_component("Movability")
+
+# X hareketi (collision kontrolü ile)
+movability.move_x(obj, 100 * app.dt)
+
+# Y hareketi (collision kontrolü ile)
+movability.move_y(obj, 100 * app.dt)
+```
+
+**Collision Kontrolü:**
+- Movability, `collidables` listesindeki tag'lere sahip objelerle çarpışır
+- Çarpışma varsa hareketi engeller
+- Multi-step movement (max 10px) - tunneling önler
+
+### Collision Detection
+
+```python
+from pygaminal.util import check_collision_by_tags
+
+# İki obje arasında collision
+if check_collision_by_tags(obj1, obj2, ["body"], ["body"]):
+    print("Collision!")
 ```
 
 ## JSON Formatı
@@ -410,12 +528,12 @@ Tüm component'ler aynı formattadır:
 ### Component Kuralları
 
 1. **`file`** - Zorunlu
-   - `@` ile başlarsa → Built-in component (`@ImageComponent`)
+   - `@` ile başlarsa → Built-in component (`@Image`)
    - `@` yoksa → User script (`MovementScript`)
 
 2. **`name`** - Opsiyonel
    - Verilirse → Bu isimle eklenir
-   - Verilmezse → Otomatik isim (`ImageComponent`, `ImageComponent2`, ...)
+   - Verilmezse → Otomatik isim (`Image`, `Image2`, ...)
 
 3. **`args`** - Opsiyonel
    - Component constructor'ına geçilecek parametreler
@@ -432,88 +550,43 @@ Tüm component'ler aynı formattadır:
     {
       "x": 100,
       "y": 200,
-      "name": "player",        // Optional unique name
-      "tags": ["hero", "main"], // Optional tags
+      "name": "player",
+      "tags": ["hero", "main"],
+      "depth": 10,
       "components": [
         {
-          "file": "@ImageComponent",
+          "file": "@Hitbox",
+          "args": [[-16, -16, 32, 32]]
+        },
+        {
+          "file": "@Movability",
+          "args": [200, ["collidable"]]
+        },
+        {
+          "file": "@Image",
           "name": "body",
-          "args": ["images/player.png", "center", "end"]
+          "args": ["images/player.png", "center", "center"]
         },
         {
-          "file": "MovementScript",
+          "file": "PlayerController",
           "args": [200]
-        },
-        {
-          "file": "@YSortComponent",
-          "args": []
         }
       ]
     },
     {
-      "x": 300,
-      "y": 150,
-      "tags": ["enemy"],
+      "x": 0,
+      "y": 0,
+      "name": "bg_music",
       "components": [
         {
-          "file": "@AnimationComponent",
-          "args": [{
-            "file": "images/explosion.png",
-            "frame_width": 32,
-            "frame_height": 32,
-            "frames": [0, 1, 2, 3],
-            "speed": 10,
-            "loop": false
-          }]
+          "file": "@BackgroundMusic",
+          "args": ["music/bgm.mp3", true, 2.0, 0.6]
         }
       ]
     }
   ]
 }
 ```
-
-## Image & Animation
-
-### Image
-Resim yükleme.
-
-```python
-from pygaminal import Image
-
-img = Image.from_file("sprite.png")
-// img.width, img.height
-```
-
-### Animation
-Animasyon sistemi.
-
-**Sprite Sheet:**
-```python
-from pygaminal import Animation
-
-anim = Animation.from_sprite_sheet(
-    "sprite.png",
-    frame_width=32,
-    frame_height=32,
-    frames=[0, 1, 2, 3],  // Optional, None = tüm frame'ler
-    speed=10,
-    loop=True
-)
-```
-
-**Frame Listesi:**
-```python
-anim = Animation.from_files([
-    "idle_0.png",
-    "idle_1.png",
-    "idle_2.png"
-], speed=5, loop=False)
-```
-
-**Metodlar:**
-- `start()` - Animasyonu başlat
-- `get_frame()` - Şu anki frame'i al
-- `is_over()` - Bitti mi?
 
 ## Script Yazma
 
@@ -525,41 +598,40 @@ from pygaminal import *
 
 class MyScript:
     def __init__(self, arg1, arg2=None):
-        // Constructor, JSON args'dan değer alır
+        # Constructor, JSON args'dan değer alır
         self.value = arg1
 
     def update(self, obj):
-        // Her frame çağrılır
+        # Her frame çağrılır
         app = App()
         scene = app.get_current_scene()
         im = InputManager()
+        audio = AudioManager()
 
-        // Input
+        # Input
         if im.is_pressed(pygame.K_SPACE):
-            // Aksiyon
+            # Aksiyon
             pass
 
-        // Hareket
-        obj.x += 100 * app.dt
+        # Hareket (Movability ile)
+        movability = obj.get_component("Movability")
+        if movability:
+            movability.move_x(obj, 100 * app.dt)
 
-        // Obje yaratma
-        bullet = Object(obj.x, obj.y, tags=["bullet", "player_owned"])
+        # Obje yaratma
+        bullet = Object(obj.x, obj.y, tags=["bullet"])
         scene.add_object(bullet)
 
-        // Obje yok etme
+        # Obje yok etme
         if obj.x > 800:
             obj.kill()
 
-        // Objelere erişim
+        # Objelere erişim
         player = scene.get_object("player")
         enemies = scene.get_objects_by_tag("enemy")
-        for enemy in enemies:
-            if enemy.has_tag("flying"):
-                // Uçan düşman
-                pass
 
     def draw(self, obj):
-        // Opsiyonel: Custom drawing
+        # Opsiyonel: Custom drawing
         pass
 ```
 
@@ -567,8 +639,156 @@ class MyScript:
 Scriptlerde her zaman erişilebilir:
 - `App()` - Singleton app instance
 - `InputManager()` - Singleton input manager
+- `AudioManager()` - Singleton audio manager
 - `Screen()` - Singleton screen
-- `Scene()` veya `app.get_current_scene()` - Aktif sahne
+- `app.get_current_scene()` - Aktif sahne
+
+## Örnek Script'ler
+
+### Player Movement (Keyboard)
+
+```python
+import pygame
+from pygaminal import *
+
+class PlayerMovementScript:
+    def __init__(self, speed=200):
+        self.speed = speed
+
+    def update(self, obj):
+        app = App()
+        im = InputManager()
+
+        # Input direction
+        dx = im.is_pressed(pygame.K_d) - im.is_pressed(pygame.K_a)
+        dy = im.is_pressed(pygame.K_s) - im.is_pressed(pygame.K_w)
+
+        # Movability ile collision-aware hareket
+        movability = obj.get_component("Movability")
+        if movability:
+            move_distance = self.speed * app.dt
+            if dx != 0:
+                movability.move_x(obj, dx * move_distance)
+            if dy != 0:
+                movability.move_y(obj, dy * move_distance)
+
+    def draw(self, obj):
+        pass
+```
+
+### Player Movement (Gamepad)
+
+```python
+from pygaminal import *
+
+class GamepadMovementScript:
+    def __init__(self, speed=200, joystick_id=0, deadzone=0.15):
+        self.speed = speed
+        self.joystick_id = joystick_id
+        self.deadzone = deadzone
+
+    def update(self, obj):
+        app = App()
+        im = InputManager()
+
+        if not im.is_joystick_connected(self.joystick_id):
+            return
+
+        # Left stick values
+        axis_x = im.get_axis(0, self.joystick_id)
+        axis_y = im.get_axis(1, self.joystick_id)
+
+        # Apply deadzone
+        if abs(axis_x) < self.deadzone:
+            axis_x = 0
+        if abs(axis_y) < self.deadzone:
+            axis_y = 0
+
+        # Move
+        movability = obj.get_component("Movability")
+        if movability:
+            move_distance = self.speed * app.dt
+            if axis_x != 0:
+                movability.move_x(obj, axis_x * move_distance)
+            if axis_y != 0:
+                movability.move_y(obj, axis_y * move_distance)
+
+    def draw(self, obj):
+        pass
+```
+
+### Bullet Shooting
+
+```python
+import pygame
+from pygaminal import *
+
+class ShootingScript:
+    def __init__(self, cooldown=0.5, bullet_speed=300):
+        self.cooldown = cooldown
+        self.bullet_speed = bullet_speed
+        self.last_shot = 0
+
+    def update(self, obj):
+        app = App()
+        scene = app.get_current_scene()
+        im = InputManager()
+
+        # Cooldown kontrolü
+        if app.now - self.last_shot < self.cooldown:
+            return
+
+        # Ateş et
+        if im.is_pressed(pygame.K_SPACE):
+            bullet = Object(obj.x, obj.y, tags=["bullet"])
+            scene.add_object(bullet)
+            self.last_shot = app.now
+
+            # Sound effect
+            sound = obj.get_component("SoundEffect")
+            if sound:
+                sound.play()
+
+    def draw(self, obj):
+        pass
+```
+
+### Bullet Movement
+
+```python
+from pygaminal import *
+
+class BulletScript:
+    def __init__(self, speed=300, direction_x=1, direction_y=0):
+        self.speed = speed
+        self.direction_x = direction_x
+        self.direction_y = direction_y
+
+    def update(self, obj):
+        app = App()
+        scene = app.get_current_scene()
+
+        # Hareket
+        obj.x += self.direction_x * self.speed * app.dt
+        obj.y += self.direction_y * self.speed * app.dt
+
+        # Ekran dışına çıktı mı?
+        if obj.x > scene.width or obj.x < 0:
+            obj.kill()
+
+        # Çarpışma kontrolü
+        enemies = scene.get_objects_by_tag("enemy")
+        for enemy in enemies:
+            # Check collision (hitbox required)
+            from pygaminal.util import check_collision_by_tags
+            if check_collision_by_tags(obj, enemy, ["body"], ["body"]):
+                enemy.kill()
+                obj.kill()
+                break
+
+    def draw(self, obj):
+        pass
+```
 
 ## Çalıştırma
 
@@ -592,348 +812,103 @@ from pygaminal import *
 run_app("scene_data.json")
 ```
 
-## Hızlı Tutorial
-
-### Adım 1: Sahne Oluştur
-
-`scene_data.json`:
-```json
-{
-  "width": 800,
-  "height": 600,
-  "background_color": "#4488ff",
-  "objects": [
-    {
-      "x": 400,
-      "y": 300,
-      "name": "player",
-      "tags": ["hero"],
-      "components": [
-        {
-          "file": "@ImageComponent",
-          "args": ["player.png", "center", "end"]
-        },
-        {
-          "file": "PlayerController",
-          "args": []
-        }
-      ]
-    }
-  ]
-}
-```
-
-### Adım 2: Script Yaz
-
-`PlayerController.py`:
-```python
-import pygame
-from pygaminal import *
-
-class PlayerController:
-    def update(self, obj):
-        app = App()
-        im = InputManager()
-
-        speed = 200
-        if im.is_pressed(pygame.K_LEFT):
-            obj.x -= speed * app.dt
-        if im.is_pressed(pygame.K_RIGHT):
-            obj.x += speed * app.dt
-        if im.is_pressed(pygame.K_UP):
-            obj.y -= speed * app.dt
-        if im.is_pressed(pygame.K_DOWN):
-            obj.y += speed * app.dt
-```
-
-### Adım 3: Çalıştır
-
-```bash
-PYTHONPATH=/path/to/pygamer python main.py
-```
-
-### Adım 4: Kontroller
-- **Arrow Keys** - Hareket
-- **Close Window** - Çıkış
-
 ## Pygame Key Constants
 
 ```python
-pygame.K_a, pygame.K_b, ...  // Harfler
-pygame.K_0, pygame.K_1, ...  // Rakamlar
-pygame.K_SPACE               // Space
-pygame.K_ESCAPE              // Escape
-pygame.K_RETURN              // Enter
-pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN  // Yön tuşları
+pygame.K_a, pygame.K_b, ...  # Harfler
+pygame.K_0, pygame.K_1, ...  # Rakamlar
+pygame.K_SPACE               # Space
+pygame.K_ESCAPE              # Escape
+pygame.K_RETURN              # Enter
+pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN  # Yön tuşları
 ```
 
 ## Tips
 
 1. **Delta Time Kullan**: Her zaman `app.dt` ile çarparak hareket ettir
 2. **Pivot**: Karakter için `"center"`, zemin objeleri için `"end"` kullan
-3. **Depth Sorting**: YSortComponent ekle, objeler otomatik sıralanır
-4. **Animasyon**: Sprite sheet kullan, performans için
-5. **Cleanup**: Biten objeleri `object.kill()` ile yok et
+3. **Depth Sorting**: `obj.depth` kullan, scene otomatik sıralar
+4. **Collision**: Movability component'i kullan, manuel yapma
+5. **Cleanup**: Biten objeleri `obj.kill()` ile yok et
 6. **Cooldowns**: `app.now` kullanarak rate limiting yap
 7. **Object Names**: Önemli objelere explicit name ver (player, boss1)
 8. **Tags**: Gruplar için kullan (enemy, bullet, pickup)
-9. **Tag Query Performance**: `get_objects_by_tag()` O(1)'dir, bolca kullanın
-10. **Component Naming**: Önemli component'lere explicit name ver, diğerlerini auto-name bırak
+9. **Performance**: `get_objects_by_tag()` O(1)'dir, bolca kullanın
+10. **Component Naming**: Önemli component'lere explicit name ver
 
 ## Performans Notları
 
 ### Objeler
 - `get_object(name)` → **O(1)** dict lookup
 - `get_objects_by_tag(tag)` → **O(1)** dict lookup
-- `get_all_objects()` → **O(n)** list comprehension
+- `get_all_objects()` → **O(n)**
 
 ### Component'ler
 - `get_component(name)` → **O(1)** dict lookup
-- `get_components(file_name)` → **O(n)** filter (ama nadır kullanılır)
+- `get_components(file_name)` → **O(n)** (nadır kullanılır)
 
 ### Update Loop
 - Her frame bir kere `_apply_pending_updates()` → **O(n × tags)**
-- Tag değişiklikleri → **O(1)** per tag
+- Depth sorting → **O(n log n)**
 
-## Component Best Practices
+## Audio Kullanım
 
-### Built-in Kullan
-Mümkünse built-in component'leri kullan:
-
-```json
-{"file": "@ImageComponent", "args": ["player.png", "center", "end"]}
-```
-
-### Custom Script Yaz
-Özel logic için script yaz:
-
-```python
-// EnemyAI.py
-class EnemyAI:
-    def __init__(self, patrol_range=100):
-        self.patrol_range = patrol_range
-        self.start_x = 0
-
-    def update(self, obj):
-        app = App()
-        scene = app.get_current_scene()
-
-        // Patrol logic
-        if obj.x > self.start_x + self.patrol_range:
-            obj.x -= 100 * app.dt
-        elif obj.x < self.start_x:
-            obj.x += 100 * app.dt
-
-        // Player'a yaklaşma
-        player = scene.get_object("player")
-        if player:
-            distance = ((obj.x - player.x)**2 + (obj.y - player.y)**2)**0.5
-            if distance < 100:
-                // Saldır!
-                pass
-```
+### Background Music
+Obje üzerinden çalın:
 
 ```json
-{"file": "EnemyAI", "args": [150]}
-```
-
-### Component Reuse
-İyi yazılmış bir script'i built-in yap:
-1. Script'i `pygaminal/components/` dizinine kopyala
-2. JSON'da `@` prefix ile kullan
-
-## Gelişmiş Kullanım Senaryoları
-
-### Senaryo 1: Bullet Spawn
-```python
-// ShootingScript.py
-class ShootingScript:
-    def __init__(self, cooldown=0.5):
-        self.cooldown = cooldown
-        self.last_shot = 0
-
-    def update(self, obj):
-        app = App()
-        scene = app.get_current_scene()
-        im = InputManager()
-
-        // Cooldown kontrolü
-        if app.now - self.last_shot < self.cooldown:
-            return
-
-        // Ateş et
-        if im.is_pressed(pygame.K_SPACE):
-            bullet = Object(obj.x, obj.y, tags=["bullet", "player_owned"])
-            scene.add_object(bullet)
-            self.last_shot = app.now
-```
-
-```python
-// BulletScript.py
-class BulletScript:
-    def __init__(self, speed=300):
-        self.speed = speed
-
-    def update(self, obj):
-        app = App()
-        scene = app.get_current_scene()
-
-        // Hareket
-        obj.x += self.speed * app.dt
-
-        // Ekran dışına çıktı mı?
-        if obj.x > scene.width:
-            obj.kill()
-
-        // Çarpışma kontrolü
-        enemies = scene.get_objects_by_tag("enemy")
-        for enemy in enemies:
-            if self.check_collision(obj, enemy):
-                enemy.kill()
-                obj.kill()
-                break
-```
-
-### Senaryo 2: Boss Fight
-```python
-// Boss Second Phase
-class BossScript:
-    def __init__(self):
-        self.phase = 1
-        self.health = 100
-
-    def update(self, obj):
-        app = App()
-        scene = app.get_current_scene()
-
-        // Phase 2'ye geç
-        if self.health < 50 and self.phase == 1:
-            self.phase = 2
-            obj.add_tag("flying")  // Tag ekle
-            // Next frame'de get_objects_by_tag("flying") bu objeyi de içerecek
-```
-
-### Senaryo 3: Tag Kategorileri
-```json
-// Editörde
 {
-  "name": "player",
-  "tags": ["hero", "controllable", "ground"]
-}
-
-{
-  "name": "enemy1",
-  "tags": ["enemy", "ground", "melee"]
-}
-
-{
-  "tags": ["enemy", "flying", "ranged"]
+  "name": "music_player",
+  "components": [
+    {
+      "file": "@BackgroundMusic",
+      "args": ["music/bgm.mp3", true, 2.0, 0.6]
+    }
+  ]
 }
 ```
 
+Kod ile kontrol:
 ```python
-// Script'te
-ground_enemies = scene.get_objects_by_tag("enemy")  // Tüm düşmanlar
-for enemy in ground_enemies:
-    if enemy.has_tag("ground"):  // Ground'da mı?
-        chase_player()
-    elif enemy.has_tag("flying"):  // Uçan mı?
-        fly_around()
+bg_music = obj.get_component("BackgroundMusic")
+bg_music.stop(fade_out=3.0)
+bg_music.play()
 ```
 
-### Senaryo 4: Multiple Components
-```python
-// Karakter: Birden fazla image layer
+### Sound Effects
+Objeye attach edilir:
+
+```json
 {
   "name": "player",
   "components": [
-    {"file": "@ImageComponent", "name": "shadow", "args": ["shadow.png"]},
-    {"file": "@ImageComponent", "name": "body", "args": ["body.png"]},
-    {"file": "@ImageComponent", "name": "armor", "args": ["armor.png"]},
-    {"file": "@ImageComponent", "name": "weapon", "args": ["sword.png"]}
+    {
+      "file": "@SoundEffect",
+      "args": ["footstep.wav", 0.8, false, false]
+    }
   ]
 }
-
-// Runtime'da
-shadow = obj.get_component("shadow")
-shadow_comp.visible = False  // Gölgeyi kapat
-
-// Veya tüm ImageComponent'leri al
-all_layers = obj.get_components("@ImageComponent")
-for layer in all_layers:
-    layer.visible = False
 ```
 
-## Object Communication
-
-### Name İle Erişim
+Script'te tetikle:
 ```python
-// Script'ten diğer objeye erişim
-scene = app.get_current_scene()
-player = scene.get_object("player")
-
-if player and player.x < obj.x:
-    // Player solda
-    chase()
+sound = obj.get_component("SoundEffect")
+if dx != 0 and not sound.is_playing():
+    sound.play()
 ```
 
-### Tag İle Grup Erişim
+### Global Audio Kontrol
 ```python
-// Tüm düşmanlara mesaj gönder
-enemies = scene.get_objects_by_tag("enemy")
-for enemy in enemies:
-    enemy.add_tag("alarmed")
+audio = AudioManager()
 
-// Tüm mermileri temizle
-bullets = scene.get_objects_by_tag("bullet")
-for bullet in bullets:
-    bullet.kill()
+# Music volume
+audio.set_music_volume(0.5)
+
+# SFX volume
+audio.set_sfx_volume(0.8)
+
+# Müzik kontrolü
+audio.pause_music()
+audio.resume_music()
+audio.stop_music(fade_out=2.0)
 ```
-
-### Distance Check
-```python
-// Player'a en yakın düşman
-scene = app.get_current_scene()
-player = scene.get_object("player")
-enemies = scene.get_objects_by_tag("enemy")
-
-closest = None
-min_dist = float('inf')
-
-for enemy in enemies:
-    dist = ((enemy.x - player.x)**2 + (enemy.y - player.y)**2)**0.5
-    if dist < min_dist:
-        min_dist = dist
-        closest = enemy
-
-if closest and min_dist < 100:
-    // En yakın düşman 100px içinde
-    closest.add_tag("targeted")
-```
-
-## Custom Rendering
-
-```python
-def draw(self, obj):
-    screen = Screen()
-    // Custom drawing logic
-    screen.draw_circle(obj.x, obj.y, 10, (255, 0, 0))
-```
-
-## Frame Consistency
-
-Tüm değişiklikler **frame sonunda** uygulanır:
-- `add_object()` → Next frame'de aktif
-- `obj.kill()` → Next frame'de silinir
-- `obj.add_tag()` → scene._tags'de next frame
-- `obj.remove_tag()` → scene._tags'ten next frame
-
-**Immediate works:**
-- `obj.has_tag()` → obj.tags'de hemen kontrol
-- `obj.tags` → Direct access
-- Component changes
-
-**Next frame works:**
-- `scene.get_object(name)`
-- `scene.get_objects_by_tag(tag)`
-- Scene update/draw loop
