@@ -511,6 +511,93 @@ if check_collision_by_tags(obj1, obj2, ["body"], ["body"]):
     print("Collision!")
 ```
 
+## .obj Dosya Formatı
+
+Objeler dış dosyalarda tanımlanabilir. `.obj` dosyaları, obje tanımından `x` ve `y` koordinatları eksik haldedir.
+
+### .obj Dosyası Örneği
+
+**player.obj:**
+```json
+{
+  "name": "player",
+  "tags": ["hero", "controllable"],
+  "depth": 10,
+  "components": [
+    {
+      "file": "@Hitbox",
+      "args": [[-16, -16, 32, 32]]
+    },
+    {
+      "file": "@Movability",
+      "args": [200, ["collidable"]]
+    },
+    {
+      "file": "@Image",
+      "args": ["player.png", "center", "center"]
+    },
+    {
+      "file": "PlayerMovementScript",
+      "args": [200]
+    }
+  ]
+}
+```
+
+### Sahne'den .obj Kullanımı
+
+**scene_data.json:**
+```json
+{
+  "width": 800,
+  "height": 600,
+  "objects": [
+    {
+      "file": "objects/player.obj",
+      "x": 400,
+      "y": 300
+    },
+    {
+      "file": "objects/enemy.obj",
+      "x": 600,
+      "y": 200
+    },
+    {
+      "file": "objects/box.obj",
+      "x": 200,
+      "y": 400
+    },
+    {
+      "file": "objects/box.obj",
+      "x": 300,
+      "y": 400
+    },
+    {
+      // Direkt obje tanımı da mümkün
+      "x": 100,
+      "y": 100,
+      "name": "unique_object",
+      "tags": ["special"],
+      "components": [...]
+    }
+  ]
+}
+```
+
+### Avantajları
+
+1. **Tekrar Kullanım**: Aynı objeyi birden fazla kez kullanabilirsiniz
+2. **Modülerlik**: Obje tanımlarını ayrı dosyalarda tutmak
+3. **Temiz Scene**: Scene dosyası daha okunabilir olur
+4. **Esneklik**: .obj dosyası ve doğrudan tanımı karıştırabilirsiniz
+
+### Kullanım Kuralları
+
+1. `.obj` dosyasında `x` ve `y` **OLMAMALI**
+2. Scene'de `file`, `x`, `y` **ZORUNLU** (external obje için)
+3. Aynı `.obj` dosyası birden fazla kez kullanılabilir
+4. Her kullanım farklı koordinatlarda yeni obje oluşturur
+
 ## JSON Formatı
 
 ### Uniform Component Formatı

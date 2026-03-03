@@ -135,9 +135,42 @@ class Scene:
 
         # Create objects
         for object_data in objects_data:
-            x = float(object_data["x"])
-            y = float(object_data["y"])
-            obj = Object.from_data(object_data, x, y)
+            obj = cls._load_object(object_data)
             scene.add_object(obj)
 
         return scene
+
+    @classmethod
+    def _load_object(cls, object_data):
+        """
+        Load an object from data (either direct dict or .obj file reference).
+
+        Args:
+            object_data: Either a direct object dict or {"file": "path.obj", "x": 100, "y": 200}
+
+        Returns:
+            Object instance
+        """
+        # Check if it's an external .obj file reference
+        if "file" in object_data:
+            # Load from .obj file
+            obj_file = object_data["file"]
+            x = float(object_data["x"])
+            y = float(object_data["y"])
+
+            # Load .obj file content
+            with open(obj_file) as f:
+                obj_data = load(f)
+
+            # Override x and y from scene
+            obj_data["x"] = x
+            obj_data["y"] = y
+
+            obj = Object.from_data(obj_data, x, y)
+        else:
+            # Direct definition in scene file
+            x = float(object_data["x"])
+            y = float(object_data["y"])
+            obj = Object.from_data(object_data, x, y)
+
+        return obj

@@ -4,186 +4,51 @@
   "background_color": "#2a2a3a",
   "objects": [
     {
+      "file": "objects/bg_music_player.obj",
       "x": 0,
-      "y": 0,
-      "name": "bg_music_player",
-      "tags": [],
-      "components": [
-        {
-          "file": "@BackgroundMusic",
-          "args": ["sounds/music.ogg", true, 1.0, 0.6]
-        }
-      ]
+      "y": 0
     },
     {
+      "file": "objects/player.obj",
       "x": 400,
-      "y": 300,
-      "name": "player",
-      "tags": ["hero", "controllable", "collidable"],
-      "components": [
-        {
-          "file": "@Hitbox",
-          "args": [[-16, -16, 32, 32]]
-        },
-        {
-          "file": "@Movability",
-          "args": [200, ["collidable", "wall"]]
-        },
-        {
-          "file": "@Image",
-          "args": ["images/player.png", "center", "center"]
-        },
-        {
-          "file": "@YSort",
-          "args": []
-        },
-        {
-          "file": "PlayerMovementScript",
-          "args": [200]
-        },
-        {
-          "file": "MusicControlScript",
-          "args": []
-        }
-      ]
+      "y": 300
     },
     {
+      "file": "objects/player2.obj",
       "x": 600,
-      "y": 300,
-      "name": "player2",
-      "tags": ["hero2"],
-      "components": [
-        {
-          "file": "@Hitbox",
-          "args": [[-16, -16, 32, 32]]
-        },
-        {
-          "file": "@Movability",
-          "args": [150, ["collidable", "wall"]]
-        },
-        {
-          "file": "@Image",
-          "args": ["images/player.png", "center", "center"]
-        },
-        {
-          "file": "@YSort",
-          "args": []
-        },
-        {
-          "file": "MouseFollowerScript",
-          "args": [150]
-        },
-        {
-          "file": "GamepadMovementScript",
-          "args": []
-        }
-      ]
+      "y": 300
     },
     {
+      "file": "objects/box.obj",
       "x": 200,
-      "y": 400,
-      "name": "box1",
-      "tags": ["collidable"],
-      "components": [
-        {
-          "file": "@Hitbox",
-          "args": [[-16, -16, 32, 32]]
-        },
-        {
-          "file": "@Image",
-          "args": ["images/box.png", "center", "center"]
-        },
-        {
-          "file": "@YSort",
-          "args": []
-        }
-      ]
+      "y": 400
     },
     {
+      "file": "objects/box.obj",
       "x": 300,
-      "y": 400,
-      "name": "box2",
-      "tags": ["collidable"],
-      "components": [
-        {
-          "file": "@Hitbox",
-          "args": [[-16, -16, 32, 32]]
-        },
-        {
-          "file": "@Image",
-          "args": ["images/box.png", "center", "center"]
-        },
-        {
-          "file": "@YSort",
-          "args": []
-        }
-      ]
+      "y": 400
     },
     {
+      "file": "objects/wall.obj",
       "x": 100,
-      "y": 200,
-      "name": "wall_left",
-      "tags": ["wall", "collidable"],
-      "components": [
-        {
-          "file": "@Hitbox",
-          "args": [[0, 0, 32, 100]]
-        },
-        {
-          "file": "@Image",
-          "args": ["images/box.png", "center", "center"]
-        },
-        {
-          "file": "@YSort",
-          "args": []
-        }
-      ]
+      "y": 200
     },
     {
+      "file": "objects/wall.obj",
       "x": 700,
-      "y": 200,
-      "name": "wall_right",
-      "tags": ["wall", "collidable"],
-      "components": [
-        {
-          "file": "@Hitbox",
-          "args": [[0, 0, 32, 100]]
-        },
-        {
-          "file": "@Image",
-          "args": ["images/box.png", "center", "center"]
-        },
-        {
-          "file": "@YSort",
-          "args": []
-        }
-      ]
+      "y": 200
     },
     {
+      "file": "objects/wall.obj",
       "x": 400,
-      "y": 100,
-      "name": "wall_top",
-      "tags": ["wall", "collidable"],
-      "components": [
-        {
-          "file": "@Hitbox",
-          "args": [[0, 0, 100, 32]]
-        },
-        {
-          "file": "@Image",
-          "args": ["images/box.png", "center", "center"]
-        },
-        {
-          "file": "@YSort",
-          "args": []
-        }
-      ]
+      "y": 100
     },
     {
       "x": 500,
       "y": 500,
       "name": "moving_obstacle",
       "tags": ["collidable", "obstacle"],
+      "depth": 5,
       "components": [
         {
           "file": "@Hitbox",
@@ -210,7 +75,6 @@
     {
       "x": 150,
       "y": 150,
-      "name": "tree1",
       "tags": ["decoration"],
       "components": [
         {
@@ -226,7 +90,6 @@
     {
       "x": 650,
       "y": 150,
-      "name": "tree2",
       "tags": ["decoration"],
       "components": [
         {
@@ -242,7 +105,6 @@
     {
       "x": 550,
       "y": 450,
-      "name": "tower1",
       "tags": ["building"],
       "components": [
         {
@@ -258,7 +120,6 @@
     {
       "x": 250,
       "y": 250,
-      "name": "tower2",
       "tags": ["building"],
       "components": [
         {
