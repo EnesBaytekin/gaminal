@@ -109,6 +109,65 @@ Sample-game dizininde tam örnek bulunmaktadır.
 - Aksiyon: Space
 - Çıkış: Pencereyi kapat
 
+## Build (Tek Dosya Executable)
+
+Oyun projenizi **PyInstaller** ile tek bir `.exe`/ELF binary'sine derleyip başka makinelere taşıyabilirsiniz. Tüm assetler, script'ler ve framework binary'nin içine gömülür; çalıştırmak için Python kurulu olması gerekmez.
+
+### 1. Build aracını yükle
+
+```bash
+# Virtual environment'da pygaminal + build bağımlılıklarını kur
+pip install "pygaminal[build]"
+# ya da geliştirme ortamında:
+pip install -e ".[build]"
+```
+
+### 2. Oyun projeni build et
+
+```bash
+# Oyun dizinine git
+cd /path/to/my-game
+
+# Build'i çalıştır
+pygaminal-build
+```
+
+Komut, içinde `main.py` bulunan dizini tarar, tüm assetleri tespit eder ve `build/` dizini altında tek bir executable oluşturur:
+
+```
+my-game/
+├── main.py
+├── scene_data.json
+├── images/…
+├── sounds/…
+├── scripts/…
+└── build/              ← oluşturulan dizin
+    └── my-game         ← tek dosya executable
+```
+
+### Seçenekler
+
+```bash
+# Farklı bir dizini build et
+pygaminal-build /path/to/game -n oyun-adi
+
+# Çıktı adını değiştir
+pygaminal-build -n MyGame
+
+# Farklı çıktı dizini
+pygaminal-build -o ./dist
+
+# Yardım
+pygaminal-build --help
+```
+
+### Önemli notlar
+
+- **Script'leriniz `importlib` ile yükleniyorsa** (ör. `@PlayerMovementScript`), build aracı bunları otomatik tespit eder ve gizli import olarak ekler.
+- **Built-in component'ler** (`@Hitbox`, `@Image`, `@Animation` vb.) otomatik olarak dahil edilir.
+- Binary **tek dosyadır** — `build/` dizininde başka hiçbir dosya bırakılmaz.
+- Çalıştırmak için binary'i herhangi bir Linux/macOS/Windows makineye kopyalayıp çalıştırmanız yeterli (pygame'in SDL kütüphaneleri dışında ek bağımlılık gerekmez).
+
 ## Dokümantasyon
 
 Detaylı dokümantasyon için [DOCUMENTATION.md](DOCUMENTATION.md) dosyasına bakın.

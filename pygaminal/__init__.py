@@ -10,9 +10,19 @@ from .util import *
 from .input_manager import InputManager
 from .audio_manager import AudioManager
 
-change_dir_to_main_dir()
+import os as _pyg_os
 
-import pygame
+# When pygaminal is imported from the build-tool CLI or from a compiled
+# game binary we skip change_dir_to_main_dir() because:
+#   - build tool  → CWD should stay wherever the user invoked it
+#   - compiled exe → argv[0] resolves to the PyInstaller temp dir which
+#                     doesn't contain the extracted data files
+# import pygame is kept unconditional — run_app() and every sub-module
+# need it in the module namespace.
+if not _pyg_os.environ.get("_PYGAMINAL_BUILD"):
+    change_dir_to_main_dir()
+
+import pygame  # noqa: E402
 
 
 def run_app(*scene_file_names):

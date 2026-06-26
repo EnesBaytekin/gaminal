@@ -4,8 +4,20 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pygaminal"
-version = "0.1.4"
+version = "0.1.5"
 description = "Pygame framework to manage entity component system (ECS) easily."
 dependencies = [
   "pygame"
 ]
+
+[project.scripts]
+pygaminal-build = "build_cli:main"
+
+[project.optional-dependencies]
+build = ["pyinstaller"]
+
+[tool.setuptools]
+py-modules = ["build_cli"]
+
+[tool.setuptools.packages.find]
+include = ["pygaminal*"]
